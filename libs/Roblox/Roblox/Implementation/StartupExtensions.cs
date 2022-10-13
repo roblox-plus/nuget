@@ -21,8 +21,8 @@ public static class StartupExtensions
     /// </exception>
     public static void AddRobloxClients(
         this IServiceCollection services,
-        Action<HttpClient> configureHttpClient = null,
-        Func<HttpMessageHandler> httpMessageHandlerFactory = null)
+        Action<IServiceProvider, HttpClient> configureHttpClient = null,
+        Func<IServiceProvider, HttpMessageHandler> httpMessageHandlerFactory = null)
     {
         if (services == null)
         {
@@ -32,21 +32,23 @@ public static class StartupExtensions
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);
     }
 
-    private static void AddRobloxHttpClient<TClientInterface, TClient>(
+    private static IHttpClientBuilder AddRobloxHttpClient<TClientInterface, TClient>(
         this IServiceCollection services,
-        Action<HttpClient> configureHttpClient = null,
-        Func<HttpMessageHandler> httpMessageHandlerFactory = null)
+        Action<IServiceProvider, HttpClient> configureHttpClient = null,
+        Func<IServiceProvider, HttpMessageHandler> httpMessageHandlerFactory = null)
         where TClientInterface : class
         where TClient : class, TClientInterface
     {
-        var httpClientBuilder = services.AddHttpClient<TClientInterface, TClient>(httpClient =>
+        var httpClientBuilder = services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
             {
-                configureHttpClient?.Invoke(httpClient);
+                configureHttpClient?.Invoke(serviceProvider, httpClient);
             });
 
         if (httpMessageHandlerFactory != null)
         {
             httpClientBuilder = httpClientBuilder.ConfigurePrimaryHttpMessageHandler(httpMessageHandlerFactory);
         }
+
+        return httpClientBuilder;
     }
 }

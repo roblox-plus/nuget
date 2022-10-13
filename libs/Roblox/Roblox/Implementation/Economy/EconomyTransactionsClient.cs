@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Roblox.Api;
 
 namespace Roblox.Economy;
@@ -26,7 +25,7 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
     }
 
     /// <inheritdoc cref="IEconomyTransactionsClient.GetUserTransactionsAsync"/>
-    public async Task<PagedResult<EconomyTransaction>> GetUserTransactionsAsync(long userId, string transactionType, string cursor, CancellationToken cancellationToken)
+    public Task<PagedResult<EconomyTransaction>> GetUserTransactionsAsync(long userId, string transactionType, string cursor, CancellationToken cancellationToken)
     {
         var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/users/{userId}/transactions", new Dictionary<string, string>
         {
@@ -35,12 +34,11 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
             ["transactionType"] = transactionType
         });
 
-        var responseBody = await _HttpClient.GetStringAsync(url, cancellationToken);
-        return JsonConvert.DeserializeObject<PagedResult<EconomyTransaction>>(responseBody);
+        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, url, cancellationToken);
     }
 
     /// <inheritdoc cref="IEconomyTransactionsClient.GetGroupTransactionsAsync"/>
-    public async Task<PagedResult<EconomyTransaction>> GetGroupTransactionsAsync(long groupId, string transactionType, string cursor, CancellationToken cancellationToken)
+    public Task<PagedResult<EconomyTransaction>> GetGroupTransactionsAsync(long groupId, string transactionType, string cursor, CancellationToken cancellationToken)
     {
         var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/groups/{groupId}/transactions", new Dictionary<string, string>
         {
@@ -49,7 +47,6 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
             ["transactionType"] = transactionType
         });
 
-        var responseBody = await _HttpClient.GetStringAsync(url, cancellationToken);
-        return JsonConvert.DeserializeObject<PagedResult<EconomyTransaction>>(responseBody);
+        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, url, cancellationToken);
     }
 }

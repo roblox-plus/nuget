@@ -12,25 +12,25 @@ public class EconomyTransactionDetails
     /// <summary>
     /// The ID of the item associated with the transaction.
     /// </summary>
-    [DataMember(Name = "id")]
-    public long Id { get; set; }
+    [DataMember(Name = "id", EmitDefaultValue = false)]
+    public long? Id { get; set; }
 
     /// <summary>
     /// The name of the item associated with the transaction.
     /// </summary>
-    [DataMember(Name = "name")]
+    [DataMember(Name = "name", EmitDefaultValue = false)]
     public string Name { get; set; }
 
     /// <summary>
     /// Payments made on the transaction.
     /// </summary>
-    [DataMember(Name = "payments")]
+    [DataMember(Name = "payments", EmitDefaultValue = false)]
     public IReadOnlyCollection<EconomyTransactionPayment> Payments { get; set; }
 
     /// <summary>
     /// The place associated with the transaction.
     /// </summary>
-    [DataMember(Name = "place")]
+    [DataMember(Name = "place", EmitDefaultValue = false)]
     public EconomyTransactionPlace Place { get; set; }
 
     /// <summary>
