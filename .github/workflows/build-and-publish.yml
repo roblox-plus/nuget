@@ -1,4 +1,4 @@
-name: "Build + Publish NuGet Package"
+name: 'Build + Publish NuGet Package'
 
 on:
   # Run workflow file whenever a pull request is opened, or a commit is pushed to it.
@@ -17,39 +17,39 @@ env:
 jobs:
   # Build NuGet packages
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
 
     env:
       # Combining the PR number, the run number, and the run attempt generates a unique
       # version every time to avoid attempting to upload duplicate versions.
       # The run number and run attempts should always be higher than the previous run.
       VersionSuffix: ${{ github.event.pull_request.number && format('pr-{0}-{1}-{2}-preview', github.event.pull_request.number, github.run_number, github.run_attempt) || '' }}
-      SOLUTION_FILE_NAME: "./libs/Roblox/Roblox.sln"
+      SOLUTION_FILE_NAME: './libs/Roblox/Roblox.sln'
 
     steps:
       # Setup
-      - name: "📥 Clone Repository"
+      - name: '📥 Clone Repository'
         uses: actions/checkout@v3
 
-      - name: "🟦 Setup .NET"
+      - name: '🟦 Setup .NET'
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.x"
+          dotnet-version: '6.x'
 
       # Build
-      - name: "🚚 NuGet Restore"
+      - name: '🚚 NuGet Restore'
         run: >-
           dotnet restore
           ${{ env.SOLUTION_FILE_NAME }}
 
-      - name: "🔨 Build Assemblies"
+      - name: '🔨 Build Assemblies'
         run: >-
           dotnet build
           ${{ env.SOLUTION_FILE_NAME }}
           --no-restore
           -c Release
 
-      - name: "🧪 Run Unit Tests"
+      - name: '🧪 Run Unit Tests'
         run: >-
           dotnet test
           ${{ env.SOLUTION_FILE_NAME }}
@@ -57,7 +57,7 @@ jobs:
           --no-restore
           -c Release
 
-      - name: "📦 Pack Assemblies"
+      - name: '📦 Pack Assemblies'
         run: >-
           dotnet pack
           ${{ env.SOLUTION_FILE_NAME }}
@@ -67,7 +67,7 @@ jobs:
           -c Release
 
       # Finish
-      - name: "📤 Attach Build Artifacts"
+      - name: '📤 Attach Build Artifacts'
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
@@ -78,28 +78,28 @@ jobs:
 
   # Upload to NuGet
   upload:
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
 
-    needs: "build"
+    needs: 'build'
 
-    environment: "release"
+    environment: 'release'
 
     if: ${{ github.event_name == 'push' }}
 
     steps:
       # Setup
-      - name: "🟦 Setup .NET"
+      - name: '🟦 Setup .NET'
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "6.x"
+          dotnet-version: '6.x'
 
-      - name: "📥 Download build artifacts"
+      - name: '📥 Download build artifacts'
         uses: actions/download-artifact@v2
         with:
           name: nuget-packages
           path: dist
 
-      - name: "📤 Publish NuGet Packages"
+      - name: '📤 Publish NuGet Packages'
         run: >-
           dotnet nuget push
           dist/*.nupkg
