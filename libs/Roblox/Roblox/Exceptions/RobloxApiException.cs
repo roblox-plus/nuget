@@ -46,22 +46,43 @@ public class RobloxApiException : Exception
     /// <param name="httpRequest">The <see cref="HttpRequestMessage"/> that was sent.</param>
     /// <param name="httpResponse">The <see cref="HttpResponseMessage"/> that generated this exception.</param>
     public RobloxApiException(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse)
-        : base($"Request to Roblox failed.\n\tStatus Code: {httpResponse.StatusCode}\n\tUrl: {httpRequest.RequestUri}")
+        : this(ParseErrorCodeResult(httpResponse), httpRequest, httpResponse)
     {
         StatusCode = httpResponse.StatusCode;
 
+    }
+
+    private RobloxApiException(ApiErrorCodeResult errorCodeResult, HttpRequestMessage httpRequest, HttpResponseMessage httpResponse)
+        : base(BuildMessage(httpRequest, httpResponse, errorCodeResult))
+    {
+        ErrorCode = errorCodeResult?.Code;
+        ErrorMessage = errorCodeResult?.Message;
+    }
+
+    private static ApiErrorCodeResult ParseErrorCodeResult(HttpResponseMessage httpResponse)
+    {
         try
         {
             var responseBody = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var errors = JsonConvert.DeserializeObject<ApiErrorResult>(responseBody);
-            var error = errors?.Errors.FirstOrDefault();
-            ErrorCode = error?.Code;
-            ErrorMessage = error?.Message;
+            return errors?.Errors.FirstOrDefault();
         }
         catch
         {
             // Couldn't parse the response body.
             // Oh well.
+            return null;
         }
+    }
+
+    private static string BuildMessage(HttpRequestMessage httpRequest, HttpResponseMessage httpResponse, ApiErrorCodeResult errorCodeResult)
+    {
+        var message = $"Request to Roblox failed.\n\tStatus Code: {httpResponse.StatusCode}\n\tUrl: {httpRequest.RequestUri}";
+        if (errorCodeResult != null)
+        {
+            message += $"\n\tError ({errorCodeResult.Code}): {errorCodeResult.Message}";
+        }
+
+        return message;
     }
 }
