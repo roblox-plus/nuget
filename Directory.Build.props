@@ -11,5 +11,6 @@
 
   <PropertyGroup Label="AssemblyProperties" Condition="'$(IsTestProject)' != 'true'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
