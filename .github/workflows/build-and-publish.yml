@@ -1,0 +1,108 @@
+name: "Build + Publish NuGet Package"
+
+on:
+  # Run workflow file whenever a pull request is opened, or a commit is pushed to it.
+  pull_request:
+    types: [opened, synchronize]
+
+  # Run workflow file on commits to the main branch.
+  push:
+    branches:
+      - master
+      - main
+
+env:
+  DOTNET_NOLOGO: true
+
+jobs:
+  # Build NuGet packages
+  build:
+    runs-on: "ubuntu-latest"
+
+    env:
+      # Combining the PR number, the run number, and the run attempt generates a unique
+      # version every time to avoid attempting to upload duplicate versions.
+      # The run number and run attempts should always be higher than the previous run.
+      VersionSuffix: ${{ github.event.pull_request.number && format('pr-{0}-{1}-{2}-preview', github.event.pull_request.number, github.run_number, github.run_attempt) || '' }}
+      SOLUTION_FILE_NAME: "./libs/Roblox/Roblox.sln"
+
+    steps:
+      # Setup
+      - name: "📥 Clone Repository"
+        uses: actions/checkout@v3
+
+      - name: "🟦 Setup .NET"
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "6.x"
+
+      # Build
+      - name: "🚚 NuGet Restore"
+        run: >-
+          dotnet restore
+          ${{ env.SOLUTION_FILE_NAME }}
+
+      - name: "🔨 Build Assemblies"
+        run: >-
+          dotnet build
+          ${{ env.SOLUTION_FILE_NAME }}
+          --no-restore
+          -c Release
+
+      - name: "🧪 Run Unit Tests"
+        run: >-
+          dotnet test
+          ${{ env.SOLUTION_FILE_NAME }}
+          --no-build
+          --no-restore
+          -c Release
+
+      - name: "📦 Pack Assemblies"
+        run: >-
+          dotnet pack
+          ${{ env.SOLUTION_FILE_NAME }}
+          --no-build
+          --no-restore
+          --output ./dist
+          -c Release
+
+      # Finish
+      - name: "📤 Attach Build Artifacts"
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          retention-days: 1
+          name: nuget-packages
+          path: |
+            dist/*.nupkg
+
+  # Upload to NuGet
+  upload:
+    runs-on: "ubuntu-latest"
+
+    needs: "build"
+
+    environment: "release"
+
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      # Setup
+      - name: "🟦 Setup .NET"
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.x"
+
+      - name: "📥 Download build artifacts"
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-packages
+          path: dist
+
+      - name: "📤 Publish NuGet Packages"
+        run: >-
+          dotnet nuget push
+          dist/*.nupkg
+          --skip-duplicate
+          --source https://api.nuget.org/v3/index.json
+          --api-key ${{ secrets.NUGET_API_KEY }}
