@@ -16,6 +16,11 @@ public static class RobloxDomain
     public const string EconomyApi = "https://economy.roblox.com";
 
     /// <summary>
+    /// The users API.
+    /// </summary>
+    public const string UsersApi = "https://users.roblox.com";
+
+    /// <summary>
     /// Builds a URI, given a domain, path, and query string parameters.
     /// </summary>
     /// <param name="domain">The domain to use for the <seealso cref="Uri"/>.</param>

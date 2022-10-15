@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Roblox.Economy;
+using Roblox.Users;
 
 namespace Roblox.Api;
 
@@ -30,6 +31,7 @@ public static class StartupExtensions
         }
 
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);
+        services.AddRobloxHttpClient<IUsersClient, UsersClient>(configureHttpClient, httpMessageHandlerFactory);
     }
 
     private static IHttpClientBuilder AddRobloxHttpClient<TClientInterface, TClient>(
