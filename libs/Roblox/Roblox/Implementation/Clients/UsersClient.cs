@@ -42,7 +42,7 @@ public class UsersClient : IUsersClient
     /// <inheritdoc cref="IUsersClient.GetAllFriendsAsync"/>
     public async Task<IReadOnlyCollection<UserResult>> GetAllFriendsAsync(long userId, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.UsersApi, $"v1/users/{userId}/friends");
+        var url = RobloxDomain.Build(RobloxDomain.FriendsApi, $"v1/users/{userId}/friends");
         var result = await _HttpClient.SendApiRequestAsync<PagedResult<UserResult>>(HttpMethod.Get, url, cancellationToken);
         return result.Data;
     }
