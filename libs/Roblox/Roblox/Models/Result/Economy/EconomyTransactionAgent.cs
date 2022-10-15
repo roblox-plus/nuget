@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Roblox.Api;
 
 namespace Roblox.Economy;
 
@@ -17,10 +18,7 @@ public class EconomyTransactionAgent
     /// <summary>
     /// The agent type.
     /// </summary>
-    /// <example>
-    /// - User
-    /// - Group
-    /// </example>
+    /// <seealso cref="RobloxEntity"/>
     [DataMember(Name = "type")]
     public string Type { get; set; }
 
