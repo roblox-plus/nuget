@@ -29,7 +29,7 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
     {
         var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/users/{userId}/transactions", new Dictionary<string, string>
         {
-            ["limit"] = "100",
+            ["limit"] = Paging.Limit,
             ["cursor"] = cursor,
             ["transactionType"] = transactionType
         });
@@ -42,7 +42,7 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
     {
         var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/groups/{groupId}/transactions", new Dictionary<string, string>
         {
-            ["limit"] = "100",
+            ["limit"] = Paging.Limit,
             ["cursor"] = cursor,
             ["transactionType"] = transactionType
         });
