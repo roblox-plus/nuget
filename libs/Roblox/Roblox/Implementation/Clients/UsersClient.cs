@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,5 +37,13 @@ public class UsersClient : IUsersClient
         {
             return null;
         }
+    }
+
+    /// <inheritdoc cref="IUsersClient.GetAllFriendsAsync"/>
+    public async Task<IReadOnlyCollection<UserResult>> GetAllFriendsAsync(long userId, CancellationToken cancellationToken)
+    {
+        var url = RobloxDomain.Build(RobloxDomain.UsersApi, $"v1/users/{userId}/friends");
+        var result = await _HttpClient.SendApiRequestAsync<PagedResult<UserResult>>(HttpMethod.Get, url, cancellationToken);
+        return result.Data;
     }
 }

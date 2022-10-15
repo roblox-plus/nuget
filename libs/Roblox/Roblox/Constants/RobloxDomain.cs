@@ -16,6 +16,11 @@ public static class RobloxDomain
     public const string EconomyApi = "https://economy.roblox.com";
 
     /// <summary>
+    /// The friends API.
+    /// </summary>
+    public const string FriendsApi = "https://friends.roblox.com";
+
+    /// <summary>
     /// The users API.
     /// </summary>
     public const string UsersApi = "https://users.roblox.com";
