@@ -45,6 +45,7 @@ public static class StartupExtensions
     {
         var httpClientBuilder = services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
             {
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roblox NuGet (https://www.nuget.org/packages/Roblox)");
                 configureHttpClient?.Invoke(serviceProvider, httpClient);
             });
 
