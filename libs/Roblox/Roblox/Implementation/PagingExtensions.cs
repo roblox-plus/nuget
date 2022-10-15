@@ -6,7 +6,7 @@ namespace Roblox.Api;
 /// <summary>
 /// Extension methods for API paging parameters.
 /// </summary>
-public static class PagingExtensions
+internal static class PagingExtensions
 {
     /// <summary>
     /// Translates a <seealso cref="ListSortDirection"/> to a value to send to Roblox APIs.
