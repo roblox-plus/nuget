@@ -27,7 +27,6 @@ public class InventoryClient : IInventoryClient
     /// <inheritdoc cref="IInventoryClient.GetAssetOwnersAsync"/>
     public Task<PagedResult<AssetOwnershipResult>> GetAssetOwnersAsync(long assetId, string cursor, ListSortDirection sortOrder, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.InventoryApi, $"v2/assets/{assetId}/owners", cursor.ToPagingParameters(sortOrder));
-        return _HttpClient.SendApiRequestAsync<PagedResult<AssetOwnershipResult>>(HttpMethod.Get, url, cancellationToken);
+        return _HttpClient.SendApiRequestAsync<PagedResult<AssetOwnershipResult>>(HttpMethod.Get, RobloxDomain.InventoryApi, $"v2/assets/{assetId}/owners", queryParameters: null, cancellationToken);
     }
 }

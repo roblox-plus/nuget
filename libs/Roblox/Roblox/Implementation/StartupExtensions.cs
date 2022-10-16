@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Roblox.Catalog;
 using Roblox.Economy;
 using Roblox.Inventory;
 using Roblox.Users;
@@ -31,28 +32,32 @@ public static class StartupExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddRobloxHttpClient<ICatalogClient, CatalogClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IInventoryClient, InventoryClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IUsersClient, UsersClient>(configureHttpClient, httpMessageHandlerFactory);
     }
 
-    private static IHttpClientBuilder AddRobloxHttpClient<TClientInterface, TClient>(
+    private static void AddRobloxHttpClient<TClientInterface, TClient>(
         this IServiceCollection services,
         Action<IServiceProvider, HttpClient> configureHttpClient = null,
         Func<IServiceProvider, HttpMessageHandler> httpMessageHandlerFactory = null)
         where TClientInterface : class
         where TClient : class, TClientInterface
     {
-        var httpClientBuilder = services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
+        services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
             {
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roblox NuGet (https://www.nuget.org/packages/Roblox)");
                 configureHttpClient?.Invoke(serviceProvider, httpClient);
+            })
+            .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+            {
+                var sendRequestHandler = httpMessageHandlerFactory != null ? httpMessageHandlerFactory(serviceProvider) : new HttpClientHandler();
+
+                var xsrfTokenHandler = new XsrfTokenHandler();
+                xsrfTokenHandler.InnerHandler = sendRequestHandler;
+
+                return xsrfTokenHandler;
             });
-
-        if (httpMessageHandlerFactory != null)
-        {
-            httpClientBuilder = httpClientBuilder.ConfigurePrimaryHttpMessageHandler(httpMessageHandlerFactory);
-        }
-
-        return httpClientBuilder;
     }
 }
