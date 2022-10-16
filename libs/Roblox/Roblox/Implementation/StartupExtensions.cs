@@ -52,8 +52,13 @@ public static class StartupExtensions
             })
             .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
             {
+                var sendRequestHandler = httpMessageHandlerFactory != null ? httpMessageHandlerFactory(serviceProvider) : new HttpClientHandler();
+
+                var metricsHandler = new MetricsHandler();
+                metricsHandler.InnerHandler = sendRequestHandler;
+
                 var xsrfTokenHandler = new XsrfTokenHandler();
-                xsrfTokenHandler.InnerHandler = httpMessageHandlerFactory != null ? httpMessageHandlerFactory(serviceProvider) : new HttpClientHandler();
+                xsrfTokenHandler.InnerHandler = metricsHandler;
 
                 return xsrfTokenHandler;
             });
