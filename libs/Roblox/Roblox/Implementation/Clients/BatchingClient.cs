@@ -77,6 +77,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     public void Dispose()
     {
         _SendTimer?.Dispose();
+        _ProcessLock?.Dispose();
     }
 
     private void TryProcess()
