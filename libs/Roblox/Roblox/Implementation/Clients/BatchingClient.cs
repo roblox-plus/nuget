@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Prometheus;
 
 namespace Roblox.Api;
 
@@ -18,6 +20,8 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     private readonly int _BatchSize;
     private readonly TimeSpan _Throttle;
     private readonly TimeSpan _SendInterval;
+    private readonly Gauge.Child _SizeGauge;
+    private readonly Histogram.Child _TimeSpentHistogram;
     private readonly Timer _SendTimer;
     private readonly SemaphoreSlim _ProcessLock = new(1, 1);
     private DateTime _LastSend = DateTime.MinValue;
@@ -29,6 +33,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     /// Initializes a new <seealso cref="BatchingClient{TId,TResult}"/>.
     /// </summary>
     /// <param name="fetchAsync">A function for fetching a batch of items, given the IDs for those items.</param>
+    /// <param name="clientName">The name of the client this batch client belongs to.</param>
     /// <param name="batchSize">The number of items to put into a single batch.</param>
     /// <param name="throttle">The minimum time to wait between sending requests.</param>
     /// <param name="sendInterval">The maximum time to wait between sending requests.</param>
@@ -38,17 +43,43 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     /// <exception cref="ArgumentNullException">
     /// - <paramref name="fetchAsync"/>
     /// </exception>
-    public BatchingClient(Func<IReadOnlyCollection<TId>, CancellationToken, Task<IReadOnlyDictionary<TId, TResult>>> fetchAsync, int batchSize, TimeSpan throttle, TimeSpan sendInterval)
+    public BatchingClient(
+        Func<IReadOnlyCollection<TId>, CancellationToken, Task<IReadOnlyDictionary<TId, TResult>>> fetchAsync,
+        string clientName,
+        int batchSize,
+        TimeSpan throttle,
+        TimeSpan sendInterval)
     {
         if (batchSize <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(batchSize));
         }
 
+        if (string.IsNullOrWhiteSpace(clientName))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(clientName));
+        }
+
         _BatchSize = batchSize;
         _Throttle = throttle;
         _SendInterval = sendInterval;
         _FetchAsync = fetchAsync ?? throw new ArgumentNullException(nameof(fetchAsync));
+
+        var itemName = typeof(TResult).Name;
+        var labelNames = new[] { "client_name", "item_name" };
+        var labelValues = new[] { clientName, typeof(TResult).Name };
+
+        _SizeGauge = Metrics.CreateGauge(
+            "roblox_batch_client_queue_size",
+            "Number of items waiting in this batched client to be sent.",
+            labelNames)
+            .WithLabels(labelValues);
+
+        _TimeSpentHistogram = Metrics.CreateHistogram(
+            "roblox_batch_client_time",
+            "How long individual items are spending in the queue.",
+            labelNames)
+            .WithLabels(labelValues);
 
         _SendTimer = new Timer(_ => TryProcessAsync().GetAwaiter().GetResult(), state: null, _MinimumSendInterval, _MinimumSendInterval);
     }
@@ -65,8 +96,10 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
                 return await existingRequest.Result.Task;
             }
 
+            using var timer = _TimeSpentHistogram.NewTimer();
             var task = new TaskCompletionSource<TResult>();
             _Requests.Add((id, task));
+            _SizeGauge.Set(Size);
 
             await TryProcessAsync();
 
@@ -111,6 +144,8 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
 
                 requestsById[request.Id] = request.Result;
             }
+
+            _SizeGauge.Set(Size);
 
             if (!requestsById.Any())
             {

@@ -114,7 +114,7 @@ internal static class HttpClientExtensions
     /// <exception cref="ArgumentException">
     /// - <typeparamref name="TConfiguration"/> is missing <see cref="DataContractAttribute"/> with <see cref="DataContractAttribute.Name"/> set.
     /// </exception>
-    internal static void BindClientConfiguration<TConfiguration>(this IConfiguration configuration, TConfiguration settings)
+    internal static string BindClientConfiguration<TConfiguration>(this IConfiguration configuration, TConfiguration settings)
         where TConfiguration : class
     {
         if (configuration == null)
@@ -137,5 +137,7 @@ internal static class HttpClientExtensions
         var clientsConfiguration = robloxConfiguration.GetSection("Clients");
         var clientConfiguration = clientsConfiguration.GetSection(dataContract.Name);
         clientConfiguration.Bind(settings);
+
+        return dataContract.Name;
     }
 }

@@ -32,16 +32,16 @@ public class CatalogClient : ICatalogClient
         _HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
         var settings = _Settings = new CatalogClientConfiguration();
-        configuration.BindClientConfiguration(settings);
+        var clientName = configuration.BindClientConfiguration(settings);
 
         if (settings.AssetBatchSize > 1)
         {
-            _AssetsClient = new BatchingClient<long, CatalogAssetDetails>(MultiGetAssetsAsync, batchSize: settings.AssetBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
+            _AssetsClient = new BatchingClient<long, CatalogAssetDetails>(MultiGetAssetsAsync, clientName, batchSize: settings.AssetBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
         }
 
         if (settings.BundleBatchSize > 1)
         {
-            _BundlesClient = new BatchingClient<long, CatalogBundleDetails>(MultiGetBundlesAsync, batchSize: settings.BundleBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
+            _BundlesClient = new BatchingClient<long, CatalogBundleDetails>(MultiGetBundlesAsync, clientName, batchSize: settings.BundleBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
         }
     }
 
