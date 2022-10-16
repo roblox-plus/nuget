@@ -9,11 +9,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Prometheus;
 
 namespace Roblox.Api;
 
 internal static class HttpClientExtensions
 {
+    private static readonly Counter _RequestsCounter = Metrics.CreateCounter(
+        "roblox_client_requests_per_second",
+        "How many requests/second are being sent outbound to Roblox.",
+        new[] { "domain", "endpoint", "status_code" });
+
+    private static readonly Histogram _ExecutionTimeHistogram = Metrics.CreateHistogram(
+        "roblox_client_execution_time",
+        "How long requests are taking to send to Roblox.",
+        new[] { "domain", "endpoint" });
+
     /// <summary>
     /// Sends an HTTP request to Roblox, and attempts to parse the result.
     /// </summary>
@@ -33,8 +44,7 @@ internal static class HttpClientExtensions
     {
         var url = RobloxDomain.Build(domain, path.ToString(), queryParameters);
         var httpRequest = new HttpRequestMessage(httpMethod, url);
-        httpRequest.Options.Set(new HttpRequestOptionsKey<object>("endpoint"), path.Format);
-        return httpClient.SendApiRequestAsync<TResult>(httpRequest, cancellationToken);
+        return httpClient.SendApiRequestAsync<TResult>(httpRequest, path.Format, cancellationToken);
     }
 
     /// <summary>
@@ -59,11 +69,10 @@ internal static class HttpClientExtensions
     {
         var url = RobloxDomain.Build(domain, path.ToString(), queryParameters);
         var httpRequest = new HttpRequestMessage(httpMethod, url);
-        httpRequest.Options.Set(new HttpRequestOptionsKey<object>("endpoint"), path.Format);
         httpRequest.Content = new StringContent(JsonConvert.SerializeObject(requestBody));
         httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        return httpClient.SendApiRequestAsync<TResult>(httpRequest, cancellationToken);
+        return httpClient.SendApiRequestAsync<TResult>(httpRequest, path.Format, cancellationToken);
     }
 
     /// <summary>
@@ -72,17 +81,24 @@ internal static class HttpClientExtensions
     /// <typeparam name="TResult">The result type.</typeparam>
     /// <param name="httpClient">The <see cref="HttpClient"/> to send the request with.</param>
     /// <param name="httpRequest">The <see cref="HttpRequestMessage"/> to send.</param>
+    /// <param name="endpoint">The endpoint which the request was sent to, for telemetry.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The <typeparamref name="TResult"/>.</returns>
     /// <exception cref="RobloxApiException">
     /// The Roblox request failed.
     /// </exception>
-    private static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, CancellationToken cancellationToken)
+    private static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, string endpoint, CancellationToken cancellationToken)
         where TResult : class
     {
+        HttpStatusCode? statusCode = null;
+        var domain = httpRequest.RequestUri?.Host ?? string.Empty;
+
         try
         {
+            using var timer = _ExecutionTimeHistogram.WithLabels(domain, endpoint).NewTimer();
             var response = await httpClient.SendAsync(httpRequest, cancellationToken);
+            statusCode = response.StatusCode;
+
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (response.IsSuccessStatusCode)
@@ -108,6 +124,17 @@ internal static class HttpClientExtensions
         catch (Exception ex)
         {
             throw new RobloxApiException($"An unknown exception occurred while sending the request to Roblox.\n\tUrl: {httpRequest.RequestUri}", ex);
+        }
+        finally
+        {
+            if (statusCode.HasValue)
+            {
+                _RequestsCounter.WithLabels(domain, endpoint, $"{(int)statusCode}").Inc();
+            }
+            else
+            {
+                _RequestsCounter.WithLabels(domain, endpoint).Inc();
+            }
         }
     }
 
