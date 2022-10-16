@@ -38,24 +38,24 @@ public static class StartupExtensions
         services.AddRobloxHttpClient<IUsersClient, UsersClient>(configureHttpClient, httpMessageHandlerFactory);
     }
 
-    private static IHttpClientBuilder AddRobloxHttpClient<TClientInterface, TClient>(
+    private static void AddRobloxHttpClient<TClientInterface, TClient>(
         this IServiceCollection services,
         Action<IServiceProvider, HttpClient> configureHttpClient = null,
         Func<IServiceProvider, HttpMessageHandler> httpMessageHandlerFactory = null)
         where TClientInterface : class
         where TClient : class, TClientInterface
     {
-        var httpClientBuilder = services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
+        services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
             {
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roblox NuGet (https://www.nuget.org/packages/Roblox)");
                 configureHttpClient?.Invoke(serviceProvider, httpClient);
+            })
+            .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+            {
+                var xsrfTokenHandler = new XsrfTokenHandler();
+                xsrfTokenHandler.InnerHandler = httpMessageHandlerFactory != null ? httpMessageHandlerFactory(serviceProvider) : new HttpClientHandler();
+
+                return xsrfTokenHandler;
             });
-
-        if (httpMessageHandlerFactory != null)
-        {
-            httpClientBuilder = httpClientBuilder.ConfigurePrimaryHttpMessageHandler(httpMessageHandlerFactory);
-        }
-
-        return httpClientBuilder;
     }
 }

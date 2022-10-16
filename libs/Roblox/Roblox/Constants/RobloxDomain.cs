@@ -11,6 +11,11 @@ namespace Roblox.Api;
 public static class RobloxDomain
 {
     /// <summary>
+    /// The Roblox domain.
+    /// </summary>
+    public const string Value = ".roblox.com";
+
+    /// <summary>
     /// The catalog API.
     /// </summary>
     public const string CatalogApi = "https://catalog.roblox.com";
