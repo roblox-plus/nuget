@@ -22,6 +22,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     private readonly SemaphoreSlim _ProcessLock = new(1, 1);
     private DateTime _LastSend = DateTime.MinValue;
 
+    /// <inheritdoc cref="IBatchClient{TId,TResult}.Size"/>
     public int Size => _Requests.Count;
 
     /// <summary>
@@ -49,7 +50,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
         _SendInterval = sendInterval;
         _FetchAsync = fetchAsync ?? throw new ArgumentNullException(nameof(fetchAsync));
 
-        _SendTimer = new Timer(_ => TryProcess(), state: null, _MinimumSendInterval, _MinimumSendInterval);
+        _SendTimer = new Timer(_ => TryProcessAsync().GetAwaiter().GetResult(), state: null, _MinimumSendInterval, _MinimumSendInterval);
     }
 
     /// <inheritdoc cref="IBatchClient{TId,TResult}.GetAsync"/>
@@ -67,7 +68,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
             var task = new TaskCompletionSource<TResult>();
             _Requests.Add((id, task));
 
-            TryProcess();
+            await TryProcessAsync();
 
             return await task.Task;
         }, cancellationToken);
@@ -80,7 +81,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
         _ProcessLock?.Dispose();
     }
 
-    private void TryProcess()
+    private async Task TryProcessAsync()
     {
         if (!ShouldProcess())
         {
@@ -88,7 +89,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
         }
 
         _LastSend = DateTime.UtcNow;
-        _ProcessLock.Wait();
+        await _ProcessLock.WaitAsync();
 
         try
         {
@@ -118,7 +119,7 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
 
             try
             {
-                var results = _FetchAsync(requestsById.Keys, CancellationToken.None).GetAwaiter().GetResult();
+                var results = await _FetchAsync(requestsById.Keys, CancellationToken.None);
                 foreach (var (id, task) in requestsById)
                 {
                     if (results.TryGetValue(id, out var result))
