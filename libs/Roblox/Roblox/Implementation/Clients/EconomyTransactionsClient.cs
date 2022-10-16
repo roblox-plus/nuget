@@ -27,26 +27,22 @@ public class EconomyTransactionsClient : IEconomyTransactionsClient
     /// <inheritdoc cref="IEconomyTransactionsClient.GetUserTransactionsAsync"/>
     public Task<PagedResult<EconomyTransaction>> GetUserTransactionsAsync(long userId, string transactionType, string cursor, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/users/{userId}/transactions", new Dictionary<string, string>
+        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v2/users/{userId}/transactions", queryParameters: new Dictionary<string, string>
         {
             ["limit"] = Paging.Limit,
             ["cursor"] = cursor,
             ["transactionType"] = transactionType
-        });
-
-        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, url, cancellationToken);
+        }, cancellationToken);
     }
 
     /// <inheritdoc cref="IEconomyTransactionsClient.GetGroupTransactionsAsync"/>
     public Task<PagedResult<EconomyTransaction>> GetGroupTransactionsAsync(long groupId, string transactionType, string cursor, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v2/groups/{groupId}/transactions", new Dictionary<string, string>
+        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v2/groups/{groupId}/transactions", queryParameters: new Dictionary<string, string>
         {
             ["limit"] = Paging.Limit,
             ["cursor"] = cursor,
             ["transactionType"] = transactionType
-        });
-
-        return _HttpClient.SendApiRequestAsync<PagedResult<EconomyTransaction>>(HttpMethod.Get, url, cancellationToken);
+        }, cancellationToken);
     }
 }

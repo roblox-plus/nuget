@@ -52,8 +52,7 @@ public class CatalogClient : ICatalogClient
 
         if (_Settings.ResaleDataEnabled && asset.Product?.Limited == true)
         {
-            var resaleUrl = RobloxDomain.Build(RobloxDomain.EconomyApi, $"v1/assets/{assetId}/resale-data");
-            var resaleData = await _HttpClient.SendApiRequestAsync<CatalogAssetResaleDataResult>(HttpMethod.Get, resaleUrl, cancellationToken);
+            var resaleData = await _HttpClient.SendApiRequestAsync<CatalogAssetResaleDataResult>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v1/assets/{assetId}/resale-data", queryParameters: null, cancellationToken);
             asset.Product.Price ??= resaleData.OriginalPrice;
             asset.Product.CountRemaining ??= resaleData.NumberRemaining;
             asset.Product.TotalAvailable ??= resaleData.TotalAvailable;
@@ -98,7 +97,6 @@ public class CatalogClient : ICatalogClient
 
     private async Task<IReadOnlyDictionary<long, CatalogAssetDetails>> MultiGetAssetsAsync(IReadOnlyCollection<long> assetIds, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.CatalogApi, "v1/catalog/items/details");
         var requestBody = new CatalogItemDetailsRequest
         {
             Data = assetIds.Select(id => new CatalogItemDetailsRequestItem
@@ -108,7 +106,7 @@ public class CatalogClient : ICatalogClient
             }).ToArray()
         };
 
-        var pagedResult = await _HttpClient.SendApiRequestAsync<CatalogItemDetailsRequest, PagedResult<CatalogItemDetailsResult>>(HttpMethod.Post, url, requestBody, cancellationToken);
+        var pagedResult = await _HttpClient.SendApiRequestAsync<CatalogItemDetailsRequest, PagedResult<CatalogItemDetailsResult>>(HttpMethod.Post, RobloxDomain.CatalogApi, $"v1/catalog/items/details", queryParameters: null, requestBody, cancellationToken);
         var assetsById = pagedResult.Data.ToDictionary(d => d.Id, d => d);
         var result = new Dictionary<long, CatalogAssetDetails>();
 
@@ -152,8 +150,10 @@ public class CatalogClient : ICatalogClient
 
     private async Task<IReadOnlyDictionary<long, CatalogBundleDetails>> MultiGetBundlesAsync(IReadOnlyCollection<long> bundleIds, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.CatalogApi, $"v1/bundles/details?bundleIds={string.Join(',', bundleIds)}");
-        var pagedResult = await _HttpClient.SendApiRequestAsync<CatalogBundleDetailsResult[]>(HttpMethod.Get, url, cancellationToken);
+        var pagedResult = await _HttpClient.SendApiRequestAsync<CatalogBundleDetailsResult[]>(HttpMethod.Get, RobloxDomain.CatalogApi, $"v1/bundles/details", queryParameters: new Dictionary<string, string>
+        {
+            ["bundleIds"] = string.Join(',', bundleIds)
+        }, cancellationToken);
         var bundlesById = pagedResult.ToDictionary(b => b.Id, b => b);
         var result = new Dictionary<long, CatalogBundleDetails>();
 

@@ -27,11 +27,9 @@ public class UsersClient : IUsersClient
     /// <inheritdoc cref="IUsersClient.GetAuthenticatedUserAsync"/>
     public async Task<UserResult> GetAuthenticatedUserAsync(CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.UsersApi, "v1/users/authenticated");
-
         try
         {
-            return await _HttpClient.SendApiRequestAsync<UserResult>(HttpMethod.Get, url, cancellationToken);
+            return await _HttpClient.SendApiRequestAsync<UserResult>(HttpMethod.Get, RobloxDomain.UsersApi, $"v1/users/authenticated", queryParameters: null, cancellationToken);
         }
         catch (RobloxUnauthenticatedException)
         {
@@ -42,8 +40,7 @@ public class UsersClient : IUsersClient
     /// <inheritdoc cref="IUsersClient.GetAllFriendsAsync"/>
     public async Task<IReadOnlyCollection<UserResult>> GetAllFriendsAsync(long userId, CancellationToken cancellationToken)
     {
-        var url = RobloxDomain.Build(RobloxDomain.FriendsApi, $"v1/users/{userId}/friends");
-        var result = await _HttpClient.SendApiRequestAsync<PagedResult<UserResult>>(HttpMethod.Get, url, cancellationToken);
+        var result = await _HttpClient.SendApiRequestAsync<PagedResult<UserResult>>(HttpMethod.Get, RobloxDomain.FriendsApi, $"v1/users/{userId}/friends", queryParameters: null, cancellationToken);
         return result.Data;
     }
 }

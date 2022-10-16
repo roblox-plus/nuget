@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,16 +20,21 @@ internal static class HttpClientExtensions
     /// <typeparam name="TResult">The result type.</typeparam>
     /// <param name="httpClient">The <see cref="HttpClient"/> to send the request with.</param>
     /// <param name="httpMethod">The <see cref="HttpMethod"/> for the request.</param>
-    /// <param name="url">The request <see cref="Uri"/>.</param>
+    /// <param name="domain">The <see cref="RobloxDomain"/> to send the request to.</param>
+    /// <param name="path">The request path.</param>
+    /// <param name="queryParameters">The query parameters for the <see cref="Uri"/>.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The <typeparamref name="TResult"/>.</returns>
     /// <exception cref="RobloxApiException">
     /// The Roblox request failed.
     /// </exception>
-    public static Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpMethod httpMethod, Uri url, CancellationToken cancellationToken)
+    public static Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpMethod httpMethod, string domain, FormattableString path, IReadOnlyDictionary<string, string> queryParameters, CancellationToken cancellationToken)
         where TResult : class
     {
-        return httpClient.SendApiRequestAsync<TResult>(new HttpRequestMessage(httpMethod, url), cancellationToken);
+        var url = RobloxDomain.Build(domain, path.ToString(), queryParameters);
+        var httpRequest = new HttpRequestMessage(httpMethod, url);
+        httpRequest.Options.Set(new HttpRequestOptionsKey<object>("endpoint"), path.Format);
+        return httpClient.SendApiRequestAsync<TResult>(httpRequest, cancellationToken);
     }
 
     /// <summary>
@@ -38,18 +44,22 @@ internal static class HttpClientExtensions
     /// <typeparam name="TRequest">The request body type.</typeparam>
     /// <param name="httpClient">The <see cref="HttpClient"/> to send the request with.</param>
     /// <param name="httpMethod">The <see cref="HttpMethod"/> for the request.</param>
-    /// <param name="url">The request <see cref="Uri"/>.</param>
+    /// <param name="domain">The <see cref="RobloxDomain"/> to send the request to.</param>
+    /// <param name="path">The request path.</param>
+    /// <param name="queryParameters">The query parameters for the <see cref="Uri"/>.</param>
     /// <param name="requestBody">The JSON request body.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The <typeparamref name="TResult"/>.</returns>
     /// <exception cref="RobloxApiException">
     /// The Roblox request failed.
     /// </exception>
-    public static Task<TResult> SendApiRequestAsync<TRequest, TResult>(this HttpClient httpClient, HttpMethod httpMethod, Uri url, TRequest requestBody, CancellationToken cancellationToken)
+    public static Task<TResult> SendApiRequestAsync<TRequest, TResult>(this HttpClient httpClient, HttpMethod httpMethod, string domain, FormattableString path, IReadOnlyDictionary<string, string> queryParameters, TRequest requestBody, CancellationToken cancellationToken)
         where TResult : class
         where TRequest : class
     {
+        var url = RobloxDomain.Build(domain, path.ToString(), queryParameters);
         var httpRequest = new HttpRequestMessage(httpMethod, url);
+        httpRequest.Options.Set(new HttpRequestOptionsKey<object>("endpoint"), path.Format);
         httpRequest.Content = new StringContent(JsonConvert.SerializeObject(requestBody));
         httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -67,7 +77,7 @@ internal static class HttpClientExtensions
     /// <exception cref="RobloxApiException">
     /// The Roblox request failed.
     /// </exception>
-    public static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, CancellationToken cancellationToken)
+    private static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, CancellationToken cancellationToken)
         where TResult : class
     {
         try
