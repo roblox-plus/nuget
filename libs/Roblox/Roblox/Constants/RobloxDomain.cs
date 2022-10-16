@@ -11,6 +11,11 @@ namespace Roblox.Api;
 public static class RobloxDomain
 {
     /// <summary>
+    /// The catalog API.
+    /// </summary>
+    public const string CatalogApi = "https://catalog.roblox.com";
+
+    /// <summary>
     /// The economy API.
     /// </summary>
     public const string EconomyApi = "https://economy.roblox.com";
