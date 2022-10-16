@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace Roblox.Catalog;
@@ -55,4 +56,10 @@ public class CatalogItemDetailsProduct
     /// </summary>
     [DataMember(Name = "totalAvailable", EmitDefaultValue = false)]
     public long? TotalAvailable { get; set; }
+
+    /// <summary>
+    /// When the item will go off sale.
+    /// </summary>
+    [DataMember(Name = "offSaleDeadline")]
+    public DateTime? OffSaleDateTime { get; set; }
 }

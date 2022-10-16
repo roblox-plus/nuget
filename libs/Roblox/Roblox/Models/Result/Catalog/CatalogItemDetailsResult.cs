@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Roblox.Api;
@@ -108,4 +109,10 @@ internal class CatalogItemDetailsResult
     /// </summary>
     [DataMember(Name = "premiumPricing")]
     public CatalogItemPremiumPricingResult PremiumPricing { get; set; }
+
+    /// <summary>
+    /// When the item will go off sale.
+    /// </summary>
+    [DataMember(Name = "offSaleDeadline")]
+    public DateTime? OffSaleDateTime { get; set; }
 }

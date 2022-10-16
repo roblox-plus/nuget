@@ -121,7 +121,8 @@ public class CatalogClient : ICatalogClient
                     Price = asset.Price,
                     PremiumPrice = asset.PremiumPricing?.Price,
                     LowestPrice = asset.LowestPrice,
-                    CountRemaining = asset.CountRemaining
+                    CountRemaining = asset.CountRemaining,
+                    OffSaleDateTime = asset.OffSaleDateTime
                 } : null;
 
                 result[id] = new CatalogAssetDetails
