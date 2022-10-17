@@ -133,7 +133,7 @@ internal static class HttpClientExtensions
             }
             else
             {
-                _RequestsCounter.WithLabels(domain, endpoint).Inc();
+                _RequestsCounter.WithLabels(domain, endpoint, string.Empty).Inc();
             }
         }
     }
