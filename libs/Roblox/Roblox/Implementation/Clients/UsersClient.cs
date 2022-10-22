@@ -20,8 +20,10 @@ public class UsersClient : IUsersClient
     /// Initializes a new <seealso cref="UsersClient"/>.
     /// </summary>
     /// <param name="httpClient">The <seealso cref="HttpClient"/> to use to make the requests.</param>
+    /// <param name="configuration">An <see cref="IConfiguration"/>.</param>
     /// <exception cref="ArgumentNullException">
     /// - <paramref name="httpClient"/>
+    /// - <paramref name="configuration"/>
     /// </exception>
     public UsersClient(HttpClient httpClient, IConfiguration configuration)
     {
