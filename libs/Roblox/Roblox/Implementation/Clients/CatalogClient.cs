@@ -63,6 +63,18 @@ public class CatalogClient : ICatalogClient
         return _BundlesClient.GetAsync(bundleId, cancellationToken);
     }
 
+    /// <inheritdoc cref="ICatalogClient.GetBundlesByAssetIdAsync"/>
+    public async Task<PagedResult<CatalogBundleDetails>> GetBundlesByAssetIdAsync(long assetId, string cursor, CancellationToken cancellationToken)
+    {
+        var pagedResult = await _HttpClient.SendApiRequestAsync<PagedResult<CatalogBundleDetailsResult>>(HttpMethod.Get, RobloxDomain.CatalogApi, $"v1/assets/{assetId}/bundles", queryParameters: null, cancellationToken);
+        return new PagedResult<CatalogBundleDetails>
+        {
+            NextPageCursor = pagedResult.NextPageCursor,
+            PreviousNextCursor = pagedResult.PreviousNextCursor,
+            Data = pagedResult.Data.Select(TranslateBundle).ToArray()
+        };
+    }
+
     /// <inheritdoc cref="ICatalogClient.GetAssetTagsAsync"/>
     public Task<IReadOnlyCollection<string>> GetAssetTagsAsync(long assetId, CancellationToken cancellationToken)
     {
@@ -136,22 +148,7 @@ public class CatalogClient : ICatalogClient
         {
             if (bundlesById.TryGetValue(id, out var bundle))
             {
-                var productDetails = bundle.Product != null ? new CatalogItemDetailsProduct
-                {
-                    Id = bundle.Product.Id,
-                    Price = bundle.Product.Free ? 0 : bundle.Product.Price,
-                } : null;
-
-                result[id] = new CatalogBundleDetails
-                {
-                    Id = bundle.Id,
-                    Type = bundle.BundleType,
-                    Name = bundle.Name,
-                    Description = bundle.Description,
-                    Creator = bundle.Creator,
-                    Product = productDetails,
-                    Items = bundle.Items
-                };
+                result[id] = TranslateBundle(bundle);
             }
             else
             {
@@ -184,5 +181,38 @@ public class CatalogClient : ICatalogClient
         }
 
         return result;
+    }
+
+    private CatalogBundleDetails TranslateBundle(CatalogBundleDetailsResult bundle)
+    {
+        CatalogItemDetailsProduct productDetails = null;
+
+        if (bundle.Product != null)
+        {
+            productDetails = new CatalogItemDetailsProduct
+            {
+                Id = bundle.Product.Id
+            };
+
+            if (bundle.Product.Free)
+            {
+                productDetails.Price = 0;
+            }
+            else if (bundle.Product.ForSale)
+            {
+                productDetails.Price = bundle.Product.Price;
+            }
+        }
+
+        return new CatalogBundleDetails
+        {
+            Id = bundle.Id,
+            Type = bundle.BundleType,
+            Name = bundle.Name,
+            Description = bundle.Description,
+            Creator = bundle.Creator,
+            Product = productDetails,
+            Items = bundle.Items
+        };
     }
 }
