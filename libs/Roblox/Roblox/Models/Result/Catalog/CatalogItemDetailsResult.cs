@@ -99,6 +99,12 @@ internal class CatalogItemDetailsResult
     public long? LowestPrice { get; set; }
 
     /// <summary>
+    /// The on sale status of the item.
+    /// </summary>
+    [DataMember(Name = "priceStatus")]
+    public string PriceStatus { get; set; }
+
+    /// <summary>
     /// The count of how many of this item are remaining for sale.
     /// </summary>
     [DataMember(Name = "unitsAvailableForConsumption")]

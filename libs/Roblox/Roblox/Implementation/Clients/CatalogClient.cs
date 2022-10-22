@@ -149,6 +149,11 @@ public class CatalogClient : ICatalogClient
                     OffSaleDateTime = asset.OffSaleDateTime
                 } : null;
 
+                if (productDetails?.Price == 0 && asset.PriceStatus != "Free")
+                {
+                    productDetails.Price = null;
+                }
+
                 result[id] = new CatalogAssetDetails
                 {
                     Id = asset.Id,
