@@ -41,6 +41,11 @@ public static class RobloxDomain
     public const string ItemConfigurationApi = "https://itemconfiguration.roblox.com";
 
     /// <summary>
+    /// The thumbnails API.
+    /// </summary>
+    public const string ThumbnailsApi = "https://thumbnails.roblox.com";
+
+    /// <summary>
     /// The users API.
     /// </summary>
     public const string UsersApi = "https://users.roblox.com";
