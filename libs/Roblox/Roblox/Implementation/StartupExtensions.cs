@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Roblox.Catalog;
 using Roblox.Economy;
 using Roblox.Inventory;
+using Roblox.Thumbnails;
 using Roblox.Users;
 
 namespace Roblox.Api;
@@ -35,6 +36,7 @@ public static class StartupExtensions
         services.AddRobloxHttpClient<ICatalogClient, CatalogClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IInventoryClient, InventoryClient>(configureHttpClient, httpMessageHandlerFactory);
+        services.AddRobloxHttpClient<IThumbnailsClient, ThumbnailsClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IUsersClient, UsersClient>(configureHttpClient, httpMessageHandlerFactory);
     }
 
