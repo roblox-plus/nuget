@@ -12,9 +12,25 @@ public interface IUsersClient
     /// <summary>
     /// Gets the authenticated user.
     /// </summary>
-    /// <param name="cancellationToken">A <seealso cref="CancellationToken"/>.</param>
-    /// <returns>The <seealso cref="UserResult"/>, or <c>null</c> if the client is unauthenticated.</returns>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="UserResult"/>, or <c>null</c> if the client is unauthenticated.</returns>
     Task<UserResult> GetAuthenticatedUserAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a user by their ID.
+    /// </summary>
+    /// <param name="id">The user ID.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="UserResult"/>, or <c>null</c> if the user does not exist.</returns>
+    Task<UserResult> GetUserByIdAsync(long id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a user by their name.
+    /// </summary>
+    /// <param name="name">The user name.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="UserResult"/>, or <c>null</c> if the user does not exist.</returns>
+    Task<UserResult> GetUserByNameAsync(string name, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets all the friends for a user.
