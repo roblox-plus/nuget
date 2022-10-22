@@ -81,6 +81,44 @@ public class CatalogClient : ICatalogClient
         return _AssetTagsClient.GetAsync(assetId, cancellationToken);
     }
 
+    /// <inheritdoc cref="ICatalogClient.SearchAsync"/>
+    public Task<PagedResult<CatalogSearchResult>> SearchAsync(CatalogSearchRequest searchRequest, string cursor, CancellationToken cancellationToken)
+    {
+        if (searchRequest == null)
+        {
+            throw new ArgumentNullException(nameof(searchRequest));
+        }
+
+        var queryParameters = new Dictionary<string, string>
+        {
+            ["limit"] = Paging.Limit,
+            ["cursor"] = cursor ?? string.Empty,
+            ["includeNotForSale"] = searchRequest.IncludeOffSaleItems.ToString().ToLower()
+        };
+
+        if (!string.IsNullOrWhiteSpace(searchRequest.Category))
+        {
+            queryParameters["category"] = searchRequest.Category;
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchRequest.Subcategory))
+        {
+            queryParameters["subcategory"] = searchRequest.Subcategory;
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchRequest.SortType))
+        {
+            queryParameters["sortType"] = searchRequest.SortType;
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchRequest.CreatorName))
+        {
+            queryParameters["creatorName"] = searchRequest.CreatorName;
+        }
+
+        return _HttpClient.SendApiRequestAsync<PagedResult<CatalogSearchResult>>(HttpMethod.Get, RobloxDomain.CatalogApi, $"v1/search/items", queryParameters, cancellationToken);
+    }
+
     private async Task<IReadOnlyDictionary<long, CatalogAssetDetails>> MultiGetAssetsAsync(IReadOnlyCollection<long> assetIds, CancellationToken cancellationToken)
     {
         var requestBody = new CatalogItemDetailsRequest

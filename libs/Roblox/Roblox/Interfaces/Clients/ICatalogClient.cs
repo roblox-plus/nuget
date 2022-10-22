@@ -42,4 +42,13 @@ public interface ICatalogClient
     /// <param name="cancellationToken">A <seealso cref="CancellationToken"/>.</param>
     /// <returns>The tags.</returns>
     Task<IReadOnlyCollection<string>> GetAssetTagsAsync(long assetId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Searches the catalog.
+    /// </summary>
+    /// <param name="searchRequest">The search parameters.</param>
+    /// <param name="cursor">The cursor to use to page through the results.</param>
+    /// <param name="cancellationToken">A <seealso cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="PagedResult{TData}"/> of <see cref="CatalogSearchResult"/>.</returns>
+    Task<PagedResult<CatalogSearchResult>> SearchAsync(CatalogSearchRequest searchRequest, string cursor, CancellationToken cancellationToken);
 }
