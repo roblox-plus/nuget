@@ -26,6 +26,14 @@ internal class CatalogClientConfiguration
     public int BundleBatchSize { get; set; } = 75;
 
     /// <summary>
+    /// How many assets to batch together for a single outbound request for tags.
+    /// </summary>
+    /// <remarks>
+    /// Set to one or below to disable batching.
+    /// </remarks>
+    public int AssetTagBatchSize { get; set; } = 50;
+
+    /// <summary>
     /// Whether or not loading asset data should load resale data, for limited items.
     /// </summary>
     public bool ResaleDataEnabled { get; set; } = true;

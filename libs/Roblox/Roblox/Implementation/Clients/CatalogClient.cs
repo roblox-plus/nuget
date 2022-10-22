@@ -63,7 +63,10 @@ public class CatalogClient : ICatalogClient
         return _BundlesClient.GetAsync(bundleId, cancellationToken);
     }
 
+    /// <inheritdoc cref="ICatalogClient.GetAssetTagsAsync"/>
+    public Task<IReadOnlyCollection<string>> GetAssetTagsAsync(long assetId, CancellationToken cancellationToken)
     {
+        return _AssetTagsClient.GetAsync(assetId, cancellationToken);
     }
 
     private async Task<IReadOnlyDictionary<long, CatalogAssetDetails>> MultiGetAssetsAsync(IReadOnlyCollection<long> assetIds, CancellationToken cancellationToken)
@@ -153,6 +156,30 @@ public class CatalogClient : ICatalogClient
             else
             {
                 result[id] = null;
+            }
+        }
+
+        return result;
+    }
+
+    private async Task<IReadOnlyDictionary<long, IReadOnlyCollection<string>>> MultiGetAssetTagsAsync(IReadOnlyCollection<long> assetIds, CancellationToken cancellationToken)
+    {
+        var pagedResult = await _HttpClient.SendApiRequestAsync<PagedResult<ItemTagsResult>>(HttpMethod.Get, RobloxDomain.ItemConfigurationApi, $"v1/item-tags", queryParameters: new Dictionary<string, string>
+        {
+            ["itemIds"] = string.Join(',', assetIds.Select(id => $"AssetId:{id}"))
+        }, cancellationToken);
+        var tagsByAssetId = pagedResult.Data.Where(r => r.AssetId.HasValue).ToDictionary(r => r.AssetId.Value, r => r.Tags.Select(t => t.Tag.Name).ToArray());
+        var result = new Dictionary<long, IReadOnlyCollection<string>>();
+
+        foreach (var assetId in assetIds)
+        {
+            if (tagsByAssetId.TryGetValue(assetId, out var tags))
+            {
+                result[assetId] = tags;
+            }
+            else
+            {
+                result[assetId] = Array.Empty<string>();
             }
         }
 
