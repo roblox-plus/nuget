@@ -1,28 +1,28 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace Roblox.Users;
+namespace Roblox.Groups;
 
 /// <summary>
-/// Information about a user.
+/// Information about a group.
 /// </summary>
 [DataContract]
-public class UserResult
+public class GroupResult
 {
     /// <summary>
-    /// The ID of the user.
+    /// The ID of the group.
     /// </summary>
     [DataMember(Name = "id")]
     public long Id { get; set; }
 
     /// <summary>
-    /// The user name.
+    /// The name of the group.
     /// </summary>
     [DataMember(Name = "name")]
     public string Name { get; set; }
 
     /// <summary>
-    /// The display name the user has set.
+    /// The owner of the group.
     /// </summary>
-    [DataMember(Name = "displayName")]
-    public string DisplayName { get; set; }
+    [DataMember(Name = "owner")]
+    public GroupOwner Owner { get; set; }
 }

@@ -21,6 +21,12 @@ internal class CatalogBundleProductResult
     public bool Free { get; set; }
 
     /// <summary>
+    /// Whether or not the bundle is for sale.
+    /// </summary>
+    [DataMember(Name = "isForSale")]
+    public bool ForSale { get; set; }
+
+    /// <summary>
     /// The price of the item.
     /// </summary>
     [DataMember(Name = "priceInRobux")]

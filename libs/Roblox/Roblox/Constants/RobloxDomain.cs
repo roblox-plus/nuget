@@ -31,6 +31,11 @@ public static class RobloxDomain
     public const string FriendsApi = "https://friends.roblox.com";
 
     /// <summary>
+    /// The groups API.
+    /// </summary>
+    public const string GroupsApi = "https://groups.roblox.com";
+
+    /// <summary>
     /// The inventory API.
     /// </summary>
     public const string InventoryApi = "https://inventory.roblox.com";

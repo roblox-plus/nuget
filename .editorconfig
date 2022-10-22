@@ -436,6 +436,10 @@ dotnet_naming_rule.parameters_rule.symbols              = parameters_group
 dotnet_naming_rule.parameters_rule.style                = camel_case_style
 dotnet_naming_rule.parameters_rule.severity             = warning
 
+# Custom
+# Disable CS8601 to allow null assignment.
+dotnet_diagnostic.CS8601.severity = none
+
 ##########################################
 # License
 ##########################################
