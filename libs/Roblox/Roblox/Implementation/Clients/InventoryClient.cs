@@ -29,4 +29,10 @@ public class InventoryClient : IInventoryClient
     {
         return _HttpClient.SendApiRequestAsync<PagedResult<AssetOwnershipResult>>(HttpMethod.Get, RobloxDomain.InventoryApi, $"v2/assets/{assetId}/owners", queryParameters: null, cancellationToken);
     }
+
+    /// <inheritdoc cref="IInventoryClient.GetOwnedBundlesByUserIdAsync"/>
+    public Task<PagedResult<BundleOwnershipResult>> GetOwnedBundlesByUserIdAsync(long userId, string cursor, ListSortDirection sortOrder, CancellationToken cancellationToken)
+    {
+        return _HttpClient.SendApiRequestAsync<PagedResult<BundleOwnershipResult>>(HttpMethod.Get, RobloxDomain.InventoryApi, $"v1/users/{userId}/bundles", queryParameters: cursor.ToPagingParameters(sortOrder), cancellationToken);
+    }
 }
