@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -85,9 +84,20 @@ internal class BatchingClient<TId, TResult> : IBatchClient<TId, TResult>, IDispo
     }
 
     /// <inheritdoc cref="IBatchClient{TId,TResult}.GetAsync"/>
-    public Task<TResult> GetAsync(TId id, CancellationToken cancellationToken)
+    public async Task<TResult> GetAsync(TId id, CancellationToken cancellationToken)
     {
-        return Task.Run(async () =>
+        if (_BatchSize <= 1)
+        {
+            var results = await _FetchAsync(new[] { id }, cancellationToken);
+            if (results.TryGetValue(id, out var result))
+            {
+                return result;
+            }
+
+            throw new KeyNotFoundException($"{_FetchAsync} did not return result for item");
+        }
+
+        return await Task.Run(async () =>
         {
             var existingRequest = _Requests.FirstOrDefault(r => r.Id.Equals(id));
             if (!existingRequest.Equals(default))

@@ -17,6 +17,7 @@ public class CatalogClient : ICatalogClient
     private readonly CatalogClientConfiguration _Settings;
     private readonly IBatchClient<long, CatalogAssetDetails> _AssetsClient;
     private readonly IBatchClient<long, CatalogBundleDetails> _BundlesClient;
+    private readonly IBatchClient<long, IReadOnlyCollection<string>> _AssetTagsClient;
 
     /// <summary>
     /// Initializes a new <seealso cref="CatalogClient"/>.
@@ -34,21 +35,15 @@ public class CatalogClient : ICatalogClient
         var settings = _Settings = new CatalogClientConfiguration();
         var clientName = configuration.BindClientConfiguration(settings);
 
-        if (settings.AssetBatchSize > 1)
-        {
-            _AssetsClient = new BatchingClient<long, CatalogAssetDetails>(MultiGetAssetsAsync, clientName, batchSize: settings.AssetBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
-        }
-
-        if (settings.BundleBatchSize > 1)
-        {
-            _BundlesClient = new BatchingClient<long, CatalogBundleDetails>(MultiGetBundlesAsync, clientName, batchSize: settings.BundleBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
-        }
+        _AssetsClient = new BatchingClient<long, CatalogAssetDetails>(MultiGetAssetsAsync, clientName, batchSize: settings.AssetBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
+        _BundlesClient = new BatchingClient<long, CatalogBundleDetails>(MultiGetBundlesAsync, clientName, batchSize: settings.BundleBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
+        _AssetTagsClient = new BatchingClient<long, IReadOnlyCollection<string>>(MultiGetAssetTagsAsync, clientName, batchSize: settings.AssetTagBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
     }
 
     /// <inheritdoc cref="ICatalogClient.GetAssetAsync"/>
     public async Task<CatalogAssetDetails> GetAssetAsync(long assetId, CancellationToken cancellationToken)
     {
-        var asset = await GetAssetByIdAsync(assetId, cancellationToken);
+        var asset = await _AssetsClient.GetAsync(assetId, cancellationToken);
 
         if (_Settings.ResaleDataEnabled && asset.Product?.Limited == true)
         {
@@ -63,36 +58,12 @@ public class CatalogClient : ICatalogClient
     }
 
     /// <inheritdoc cref="ICatalogClient.GetBundleAsync"/>
-    public async Task<CatalogBundleDetails> GetBundleAsync(long bundleId, CancellationToken cancellationToken)
+    public Task<CatalogBundleDetails> GetBundleAsync(long bundleId, CancellationToken cancellationToken)
     {
-        if (_BundlesClient == null)
-        {
-            var result = await MultiGetBundlesAsync(new[] { bundleId }, cancellationToken);
-            if (result.TryGetValue(bundleId, out var bundle))
-            {
-                return bundle;
-            }
-
-            return null;
-        }
-
-        return await _BundlesClient.GetAsync(bundleId, cancellationToken);
+        return _BundlesClient.GetAsync(bundleId, cancellationToken);
     }
 
-    private async Task<CatalogAssetDetails> GetAssetByIdAsync(long assetId, CancellationToken cancellationToken)
     {
-        if (_AssetsClient == null)
-        {
-            var result = await MultiGetAssetsAsync(new[] { assetId }, cancellationToken);
-            if (result.TryGetValue(assetId, out var asset))
-            {
-                return asset;
-            }
-
-            return null;
-        }
-
-        return await _AssetsClient.GetAsync(assetId, cancellationToken);
     }
 
     private async Task<IReadOnlyDictionary<long, CatalogAssetDetails>> MultiGetAssetsAsync(IReadOnlyCollection<long> assetIds, CancellationToken cancellationToken)
