@@ -1,3 +1,5 @@
+using System;
+
 namespace Roblox.Api;
 
 /// <summary>
@@ -268,11 +270,13 @@ public enum AssetType
     /// <summary>
     /// EarAccessory
     /// </summary>
+    [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EarAccessory = 57,
 
     /// <summary>
     /// EyeAccessory
     /// </summary>
+    [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EyeAccessory = 58,
 
     /// <summary>
