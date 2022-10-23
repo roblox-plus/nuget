@@ -1,3 +1,5 @@
+using System;
+
 namespace Roblox.Api;
 
 /// <summary>
@@ -268,11 +270,13 @@ public enum AssetType
     /// <summary>
     /// EarAccessory
     /// </summary>
+    [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EarAccessory = 57,
 
     /// <summary>
     /// EyeAccessory
     /// </summary>
+    [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EyeAccessory = 58,
 
     /// <summary>
@@ -358,5 +362,25 @@ public enum AssetType
     /// <summary>
     /// MeshHiddenSurfaceRemoval
     /// </summary>
-    MeshHiddenSurfaceRemoval = 75
+    MeshHiddenSurfaceRemoval = 75,
+
+    /// <summary>
+    /// EyebrowAccessory
+    /// </summary>
+    EyebrowAccessory = 76,
+
+    /// <summary>
+    /// EyelashAccessory
+    /// </summary>
+    EyelashAccessory = 77,
+
+    /// <summary>
+    /// MoodAnimation
+    /// </summary>
+    MoodAnimation = 78,
+
+    /// <summary>
+    /// DynamicHead
+    /// </summary>
+    DynamicHead = 79,
 }
