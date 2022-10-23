@@ -358,5 +358,25 @@ public enum AssetType
     /// <summary>
     /// MeshHiddenSurfaceRemoval
     /// </summary>
-    MeshHiddenSurfaceRemoval = 75
+    MeshHiddenSurfaceRemoval = 75,
+
+    /// <summary>
+    /// EyebrowAccessory
+    /// </summary>
+    EyebrowAccessory = 76,
+
+    /// <summary>
+    /// EyelashAccessory
+    /// </summary>
+    EyelashAccessory = 77,
+
+    /// <summary>
+    /// MoodAnimation
+    /// </summary>
+    MoodAnimation = 78,
+
+    /// <summary>
+    /// DynamicHead
+    /// </summary>
+    DynamicHead = 79,
 }
