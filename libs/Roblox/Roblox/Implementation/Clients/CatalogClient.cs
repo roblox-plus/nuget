@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Roblox.Api;
 using Roblox.Models.Result.Catalog;
+using TixFactory.Queueing;
 
 namespace Roblox.Catalog;
 
@@ -19,6 +20,7 @@ public class CatalogClient : ICatalogClient
     private readonly IBatchClient<long, CatalogAssetDetails> _AssetsClient;
     private readonly IBatchClient<long, CatalogBundleDetails> _BundlesClient;
     private readonly IBatchClient<long, IReadOnlyCollection<string>> _AssetTagsClient;
+    private readonly ITaskThrottler<CatalogAssetResaleDataResult> _ResaleDataThrottler;
 
     /// <summary>
     /// Initializes a new <seealso cref="CatalogClient"/>.
@@ -39,6 +41,7 @@ public class CatalogClient : ICatalogClient
         _AssetsClient = new BatchingClient<long, CatalogAssetDetails>(MultiGetAssetsAsync, clientName, batchSize: settings.AssetBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
         _BundlesClient = new BatchingClient<long, CatalogBundleDetails>(MultiGetBundlesAsync, clientName, batchSize: settings.BundleBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
         _AssetTagsClient = new BatchingClient<long, IReadOnlyCollection<string>>(MultiGetAssetTagsAsync, clientName, batchSize: settings.AssetTagBatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
+        _ResaleDataThrottler = new TaskThrottler<CatalogAssetResaleDataResult>(settings.ResaleDataThrottle);
     }
 
     /// <inheritdoc cref="ICatalogClient.GetAssetAsync"/>
@@ -85,7 +88,7 @@ public class CatalogClient : ICatalogClient
 
         if (_Settings.ResaleDataEnabled && asset?.Product?.Limited == true)
         {
-            var resaleData = await _HttpClient.SendApiRequestAsync<CatalogAssetResaleDataResult>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v1/assets/{assetId}/resale-data", queryParameters: null, cancellationToken);
+            var resaleData = await _ResaleDataThrottler.RunAsync(() => _HttpClient.SendApiRequestAsync<CatalogAssetResaleDataResult>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v1/assets/{assetId}/resale-data", queryParameters: null, cancellationToken), cancellationToken);
             asset.Product.Price ??= resaleData.OriginalPrice;
             asset.Product.CountRemaining ??= resaleData.NumberRemaining;
             asset.Product.TotalAvailable ??= resaleData.TotalAvailable;

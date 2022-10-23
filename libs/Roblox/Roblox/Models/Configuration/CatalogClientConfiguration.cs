@@ -47,4 +47,9 @@ internal class CatalogClientConfiguration
     /// The maximum time to wait before sending a batched request.
     /// </summary>
     public TimeSpan MaxWaitTime { get; set; } = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// How long to wait between sending requests to load limited resale data.
+    /// </summary>
+    public TimeSpan ResaleDataThrottle { get; set; } = TimeSpan.FromSeconds(5);
 }
