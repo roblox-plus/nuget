@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Roblox.Models.Result.Catalog;
+namespace Roblox.Catalog;
 
 /// <summary>
 /// Resale data from the economy API.

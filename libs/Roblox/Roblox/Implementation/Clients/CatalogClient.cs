@@ -7,8 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Roblox.Api;
-using Roblox.Models.Result.Catalog;
-using TixFactory.Queueing;
 
 namespace Roblox.Catalog;
 
