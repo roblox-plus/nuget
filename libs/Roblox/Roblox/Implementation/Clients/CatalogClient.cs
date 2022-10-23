@@ -45,7 +45,7 @@ public class CatalogClient : ICatalogClient
     {
         var asset = await _AssetsClient.GetAsync(assetId, cancellationToken);
 
-        if (_Settings.ResaleDataEnabled && asset.Product?.Limited == true)
+        if (_Settings.ResaleDataEnabled && asset?.Product?.Limited == true)
         {
             var resaleData = await _HttpClient.SendApiRequestAsync<CatalogAssetResaleDataResult>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v1/assets/{assetId}/resale-data", queryParameters: null, cancellationToken);
             asset.Product.Price ??= resaleData.OriginalPrice;

@@ -439,6 +439,10 @@ dotnet_naming_rule.parameters_rule.severity             = warning
 # Custom
 # Disable CS8601 to allow null assignment.
 dotnet_diagnostic.CS8601.severity = none
+# Disable CA1848 to ignore warnings about more performant logger method.
+dotnet_diagnostic.CA1848.severity = none
+# Disable CA2254 to allow formatted string in logger usage.
+dotnet_diagnostic.CA2254.severity = none
 
 ##########################################
 # License
