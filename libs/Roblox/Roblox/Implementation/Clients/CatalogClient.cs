@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,43 @@ public class CatalogClient : ICatalogClient
     public async Task<CatalogAssetDetails> GetAssetAsync(long assetId, CancellationToken cancellationToken)
     {
         var asset = await _AssetsClient.GetAsync(assetId, cancellationToken);
+
+        if (asset == null)
+        {
+            try
+            {
+                var assetDetails = await _HttpClient.SendApiRequestAsync<AssetDetailsResult>(HttpMethod.Get, RobloxDomain.EconomyApi, $"v2/assets/{assetId}/details", queryParameters: null, cancellationToken);
+                if (assetDetails.TargetId == assetId)
+                {
+                    var product = assetDetails.ProductId > 0 ? new CatalogItemDetailsProduct
+                    {
+                        Id = assetDetails.ProductId,
+                        Limited = assetDetails.IsLimited || assetDetails.IsLimitedUnique,
+                        CountRemaining = assetDetails.RemainingCount,
+                        Price = assetDetails.Free ? 0 : (assetDetails.IsForSale ? assetDetails.Price : null)
+                    } : null;
+
+                    asset = new CatalogAssetDetails
+                    {
+                        Id = assetId,
+                        Name = assetDetails.Name,
+                        Description = assetDetails.Description,
+                        AssetType = assetDetails.AssetType,
+                        Creator = new CatalogItemCreator
+                        {
+                            Id = assetDetails.Creator.Id,
+                            Name = assetDetails.Creator.Name,
+                            Type = assetDetails.Creator.Type
+                        },
+                        Product = product
+                    };
+                }
+            }
+            catch (RobloxApiException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return null;
+            }
+        }
 
         if (_Settings.ResaleDataEnabled && asset?.Product?.Limited == true)
         {
