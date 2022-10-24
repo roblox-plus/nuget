@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Roblox.Api;
 
@@ -20,6 +21,7 @@ public enum AssetType
     /// <summary>
     /// TShirt
     /// </summary>
+    [Display(Name = "T-Shirt")]
     TShirt = 2,
 
     /// <summary>
@@ -100,11 +102,13 @@ public enum AssetType
     /// <summary>
     /// Badge
     /// </summary>
+    [Obsolete("Badges are no longer assets.")]
     Badge = 21,
 
     /// <summary>
     /// GroupEmblem
     /// </summary>
+    [Display(Name = "Group Icon")]
     GroupEmblem = 22,
 
     /// <summary>
@@ -150,6 +154,7 @@ public enum AssetType
     /// <summary>
     /// Package
     /// </summary>
+    [Obsolete("Packages were replaced by bundles.")]
     Package = 32,
 
     /// <summary>
@@ -160,6 +165,7 @@ public enum AssetType
     /// <summary>
     /// GamePass
     /// </summary>
+    [Obsolete("Game passes are no longer assets.")]
     GamePass = 34,
 
     /// <summary>
@@ -190,36 +196,43 @@ public enum AssetType
     /// <summary>
     /// HairAccessory
     /// </summary>
+    [Display(Name = "Hair")]
     HairAccessory = 41,
 
     /// <summary>
     /// FaceAccessory
     /// </summary>
+    [Display(Name = "Face Accessory")]
     FaceAccessory = 42,
 
     /// <summary>
     /// NeckAccessory
     /// </summary>
+    [Display(Name = "Neck Accessory")]
     NeckAccessory = 43,
 
     /// <summary>
     /// ShoulderAccessory
     /// </summary>
+    [Display(Name = "Shoulder Accessory")]
     ShoulderAccessory = 44,
 
     /// <summary>
     /// FrontAccessory
     /// </summary>
+    [Display(Name = "Front Accessory")]
     FrontAccessory = 45,
 
     /// <summary>
     /// BackAccessory
     /// </summary>
+    [Display(Name = "Back Accessory")]
     BackAccessory = 46,
 
     /// <summary>
     /// WaistAccessory
     /// </summary>
+    [Display(Name = "Waist Accessory")]
     WaistAccessory = 47,
 
     /// <summary>
@@ -307,46 +320,55 @@ public enum AssetType
     /// <summary>
     /// TShirtAccessory
     /// </summary>
+    [Display(Name = "T-Shirt")]
     TShirtAccessory = 64,
 
     /// <summary>
     /// ShirtAccessory
     /// </summary>
+    [Display(Name = "Shirt")]
     ShirtAccessory = 65,
 
     /// <summary>
     /// PantsAccessory
     /// </summary>
+    [Display(Name = "Pants")]
     PantsAccessory = 66,
 
     /// <summary>
     /// JacketAccessory
     /// </summary>
+    [Display(Name = "Jacket")]
     JacketAccessory = 67,
 
     /// <summary>
     /// SweaterAccessory
     /// </summary>
+    [Display(Name = "Sweater")]
     SweaterAccessory = 68,
 
     /// <summary>
     /// ShortsAccessory
     /// </summary>
+    [Display(Name = "Shorts")]
     ShortsAccessory = 69,
 
     /// <summary>
     /// LeftShoeAccessory
     /// </summary>
+    [Display(Name = "Left Shoe")]
     LeftShoeAccessory = 70,
 
     /// <summary>
     /// RightShoeAccessory
     /// </summary>
+    [Display(Name = "Right Shoe")]
     RightShoeAccessory = 71,
 
     /// <summary>
     /// DressSkirtAccessory
     /// </summary>
+    [Display(Name = "Skirt")]
     DressSkirtAccessory = 72,
 
     /// <summary>
@@ -367,11 +389,13 @@ public enum AssetType
     /// <summary>
     /// EyebrowAccessory
     /// </summary>
+    [Display(Name = "Eyebrows")]
     EyebrowAccessory = 76,
 
     /// <summary>
     /// EyelashAccessory
     /// </summary>
+    [Display(Name = "Eyelashes")]
     EyelashAccessory = 77,
 
     /// <summary>
@@ -382,5 +406,6 @@ public enum AssetType
     /// <summary>
     /// DynamicHead
     /// </summary>
+    [Display(Name = "Head")]
     DynamicHead = 79,
 }
