@@ -19,7 +19,7 @@ public enum AssetType
     Image = 1,
 
     /// <summary>
-    /// TShirt
+    /// T-Shirt
     /// </summary>
     [Display(Name = "T-Shirt")]
     TShirt = 2,
@@ -106,7 +106,7 @@ public enum AssetType
     Badge = 21,
 
     /// <summary>
-    /// GroupEmblem
+    /// Group Emblem
     /// </summary>
     [Display(Name = "Group Icon")]
     GroupEmblem = 22,
@@ -132,23 +132,27 @@ public enum AssetType
     Torso = 27,
 
     /// <summary>
-    /// RightArm
+    /// Right Arm
     /// </summary>
+    [Display(Name = "Right Arm")]
     RightArm = 28,
 
     /// <summary>
-    /// LeftArm
+    /// Left Arm
     /// </summary>
+    [Display(Name = "Left Arm")]
     LeftArm = 29,
 
     /// <summary>
-    /// LeftLeg
+    /// Left Leg
     /// </summary>
+    [Display(Name = "Left Leg")]
     LeftLeg = 30,
 
     /// <summary>
-    /// RightLeg
+    /// Right Leg
     /// </summary>
+    [Display(Name = "Right Leg")]
     RightLeg = 31,
 
     /// <summary>
@@ -158,8 +162,9 @@ public enum AssetType
     Package = 32,
 
     /// <summary>
-    /// YouTubeVideo
+    /// YouTube Video
     /// </summary>
+    [Display(Name = "YouTube Video")]
     YouTubeVideo = 33,
 
     /// <summary>
@@ -184,13 +189,15 @@ public enum AssetType
     Plugin = 38,
 
     /// <summary>
-    /// SolidModel
+    /// Solid Model
     /// </summary>
+    [Display(Name = "Solid Model")]
     SolidModel = 39,
 
     /// <summary>
     /// MeshPart
     /// </summary>
+    [Display(Name = "Mesh Part")]
     MeshPart = 40,
 
     /// <summary>
@@ -200,106 +207,119 @@ public enum AssetType
     HairAccessory = 41,
 
     /// <summary>
-    /// FaceAccessory
+    /// Face Accessory
     /// </summary>
     [Display(Name = "Face Accessory")]
     FaceAccessory = 42,
 
     /// <summary>
-    /// NeckAccessory
+    /// Neck Accessory
     /// </summary>
     [Display(Name = "Neck Accessory")]
     NeckAccessory = 43,
 
     /// <summary>
-    /// ShoulderAccessory
+    /// Shoulder Accessory
     /// </summary>
     [Display(Name = "Shoulder Accessory")]
     ShoulderAccessory = 44,
 
     /// <summary>
-    /// FrontAccessory
+    /// Front Accessory
     /// </summary>
     [Display(Name = "Front Accessory")]
     FrontAccessory = 45,
 
     /// <summary>
-    /// BackAccessory
+    /// Back Accessory
     /// </summary>
     [Display(Name = "Back Accessory")]
     BackAccessory = 46,
 
     /// <summary>
-    /// WaistAccessory
+    /// Waist Accessory
     /// </summary>
     [Display(Name = "Waist Accessory")]
     WaistAccessory = 47,
 
     /// <summary>
-    /// ClimbAnimation
+    /// Climb Animation
     /// </summary>
+    [Display(Name = "Climb Animation")]
     ClimbAnimation = 48,
 
     /// <summary>
-    /// DeathAnimation
+    /// Death Animation
     /// </summary>
+    [Display(Name = "Death Animation")]
     DeathAnimation = 49,
 
     /// <summary>
-    /// FallAnimation
+    /// Fall Animation
     /// </summary>
+    [Display(Name = "Fall Animation")]
     FallAnimation = 50,
 
     /// <summary>
-    /// IdleAnimation
+    /// Idle Animation
     /// </summary>
+    [Display(Name = "Idle Animation")]
     IdleAnimation = 51,
 
     /// <summary>
-    /// JumpAnimation
+    /// Jump Animation
     /// </summary>
+    [Display(Name = "Jump Animation")]
     JumpAnimation = 52,
 
     /// <summary>
-    /// RunAnimation
+    /// Run Animation
     /// </summary>
+    [Display(Name = "Run Animation")]
     RunAnimation = 53,
 
     /// <summary>
-    /// SwimAnimation
+    /// Swim Animation
     /// </summary>
+    [Display(Name = "Swim Animation")]
     SwimAnimation = 54,
 
     /// <summary>
-    /// WalkAnimation
+    /// Walk Animation
     /// </summary>
+    [Display(Name = "Walk Animation")]
     WalkAnimation = 55,
 
     /// <summary>
-    /// PoseAnimation
+    /// Pose Animation
     /// </summary>
+    [Display(Name = "Pose Animation")]
     PoseAnimation = 56,
 
     /// <summary>
-    /// EarAccessory
+    /// Ear Accessory
     /// </summary>
+    [Display(Name = "Ear Accessory")]
     [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EarAccessory = 57,
 
     /// <summary>
-    /// EyeAccessory
+    /// Eye Accessory
     /// </summary>
+    [Display(Name = "Eye Accessory")]
     [Obsolete("None of these exist on Roblox, and it appears to be obsolete.")]
     EyeAccessory = 58,
 
     /// <summary>
-    /// LocalizationTableManifest
+    /// Localization Table Manifest
     /// </summary>
+    [Display(Name = "Localization Table Manifest")]
     LocalizationTableManifest = 59,
 
     /// <summary>
-    /// LocalizationTableTranslation
+    /// Localization Table Translation
     /// </summary>
+    [Display(Name = "Localization Table Translation")]
     LocalizationTableTranslation = 60,
 
     /// <summary>
@@ -313,8 +333,9 @@ public enum AssetType
     Video = 62,
 
     /// <summary>
-    /// TexturePack
+    /// Texture Pack
     /// </summary>
+    [Display(Name = "Texture Pack")]
     TexturePack = 63,
 
     /// <summary>
@@ -372,18 +393,21 @@ public enum AssetType
     DressSkirtAccessory = 72,
 
     /// <summary>
-    /// FontFamily
+    /// Font Family
     /// </summary>
+    [Display(Name = "Font Family")]
     FontFamily = 73,
 
     /// <summary>
-    /// FontFace
+    /// Font Face
     /// </summary>
+    [Display(Name = "Font Face")]
     FontFace = 74,
 
     /// <summary>
-    /// MeshHiddenSurfaceRemoval
+    /// Mesh-Hidden Surface Removal
     /// </summary>
+    [Display(Name = "Mesh-Hidden Surface Removal")]
     MeshHiddenSurfaceRemoval = 75,
 
     /// <summary>
@@ -401,6 +425,7 @@ public enum AssetType
     /// <summary>
     /// MoodAnimation
     /// </summary>
+    [Display(Name = "Mood Animation")]
     MoodAnimation = 78,
 
     /// <summary>
