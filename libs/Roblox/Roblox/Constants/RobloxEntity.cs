@@ -36,4 +36,20 @@ public static class RobloxEntity
     /// https://www.roblox.com/bundles/192/Korblox-Deathspeaker
     /// </example>
     public const string Bundle = "Bundle";
+
+    /// <summary>
+    /// Game Pass
+    /// </summary>
+    /// <example>
+    /// https://www.roblox.com/game-pass/4257788/Bear-Bee
+    /// </example>
+    public const string GamePass = "GamePass";
+
+    /// <summary>
+    /// Badge
+    /// </summary>
+    /// <example>
+    /// https://www.roblox.com/badges/1887996626/WOE
+    /// </example>
+    public const string Badge = "Badge";
 }
