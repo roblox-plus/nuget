@@ -42,5 +42,19 @@ namespace Roblox.Tests
             var uri = RobloxDomain.Build(domain, path, queryParameters);
             return uri.ToString();
         }
+
+        [TestCase(RobloxEntity.User, 48103520, "WebGL3D", ExpectedResult = "https://www.roblox.com/users/48103520/profile")]
+        [TestCase(RobloxEntity.Group, 2518656, "Roblox+", ExpectedResult = "https://www.roblox.com/groups/2518656/Roblox")]
+        [TestCase(RobloxEntity.Asset, 1272714, "Wanwood Antlers", ExpectedResult = "https://www.roblox.com/catalog/1272714/Wanwood-Antlers")]
+        [TestCase(RobloxEntity.Bundle, 192, "Korblox Deathspeaker", ExpectedResult = "https://www.roblox.com/bundles/192/Korblox-Deathspeaker")]
+        [TestCase(RobloxEntity.GamePass, 4257788, "Bear Bee", ExpectedResult = "https://www.roblox.com/game-pass/4257788/Bear-Bee")]
+        [TestCase(RobloxEntity.Badge, 1887996626, "WOE", ExpectedResult = "https://www.roblox.com/badges/1887996626/WOE")]
+        [TestCase(RobloxEntity.Group, 2518656, "+", ExpectedResult = "https://www.roblox.com/groups/2518656/unnamed")]
+        public string BuildWebsiteItemUrl_ValidArguments_ReturnsUrl(string robloxEntity, long id, string name)
+        {
+            // Most of these tests aren't actually good, because they don't touch enough special characters.
+            var url = RobloxDomain.BuildWebsiteItemUrl(robloxEntity, id, name);
+            return url.ToString();
+        }
     }
 }

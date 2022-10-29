@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Roblox.Api;
@@ -10,6 +11,8 @@ namespace Roblox.Api;
 /// </summary>
 public static class RobloxDomain
 {
+    private static readonly Regex _UrlNameRegex = new(@"\W+");
+
     /// <summary>
     /// The Roblox domain.
     /// </summary>
@@ -56,6 +59,27 @@ public static class RobloxDomain
     public const string UsersApi = "https://users.roblox.com";
 
     /// <summary>
+    /// The main website.
+    /// </summary>
+    public const string Website = "https://www.roblox.com";
+
+    /// <summary>
+    /// Builds a named Roblox website URL.
+    /// </summary>
+    /// <param name="robloxEntity">The <see cref="RobloxEntity"/>.</param>
+    /// <param name="id">The ID of the item.</param>
+    /// <param name="name">The name of the item.</param>
+    /// <returns>The <see cref="Uri"/>.</returns>
+    /// <exception cref="ArgumentException">
+    /// - <paramref name="robloxEntity"/> is invalid.
+    /// </exception>
+    public static Uri BuildWebsiteItemUrl(string robloxEntity, long id, string name)
+    {
+        var seoName = robloxEntity == RobloxEntity.User ? "profile" : GetUrlName(name);
+        return new Uri($"{Website}/{TranslateRobloxEntity(robloxEntity)}/{id}/{seoName}");
+    }
+
+    /// <summary>
     /// Builds a URI, given a domain, path, and query string parameters.
     /// </summary>
     /// <param name="domain">The domain to use for the <seealso cref="Uri"/>.</param>
@@ -84,5 +108,40 @@ public static class RobloxDomain
         }
 
         return uriBuilder.Uri;
+    }
+
+    private static string TranslateRobloxEntity(string robloxEntity)
+    {
+        switch (robloxEntity)
+        {
+            case RobloxEntity.Group:
+                return "groups";
+            case RobloxEntity.Asset:
+                return "catalog";
+            case RobloxEntity.User:
+                return "users";
+            case RobloxEntity.Bundle:
+                return "bundles";
+            case RobloxEntity.GamePass:
+                return "game-pass";
+            case RobloxEntity.Badge:
+                return "badges";
+            default:
+                throw new ArgumentException($"Unknown Roblox entity type: {robloxEntity}", nameof(robloxEntity));
+        }
+    }
+
+    private static string GetUrlName(string name)
+    {
+        var strippedName = name.Replace("'", string.Empty).Trim();
+        var replacedName = _UrlNameRegex.Replace(strippedName, "-");
+        var finalName = replacedName.Trim('-');
+
+        if (string.IsNullOrWhiteSpace(finalName))
+        {
+            return "unnamed";
+        }
+
+        return finalName;
     }
 }
