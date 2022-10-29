@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Roblox.Catalog;
 using Roblox.Economy;
@@ -51,7 +52,22 @@ public static class StartupExtensions
     {
         services.AddHttpClient<TClientInterface, TClient>((serviceProvider, httpClient) =>
             {
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roblox NuGet (https://www.nuget.org/packages/Roblox)");
+                var settings = new HttpClientConfiguration();
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                var robloxConfiguration = configuration.GetSection("Roblox");
+                var httpClientConfiguration = robloxConfiguration.GetSection("HttpClient");
+                httpClientConfiguration.Bind(settings);
+
+                if (!string.IsNullOrWhiteSpace(settings.UserAgent))
+                {
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", settings.UserAgent);
+                }
+
+                if (settings.Timeout > TimeSpan.Zero)
+                {
+                    httpClient.Timeout = settings.Timeout;
+                }
+
                 configureHttpClient?.Invoke(serviceProvider, httpClient);
             })
             .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
