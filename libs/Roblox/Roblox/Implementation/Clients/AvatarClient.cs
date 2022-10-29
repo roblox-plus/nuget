@@ -37,4 +37,10 @@ public class AvatarClient : IAvatarClient
         var avatarRules = _AvatarRules = await _HttpClient.SendApiRequestAsync<AvatarRules>(HttpMethod.Get, RobloxDomain.AvatarApi, $"v1/avatar-rules", ImmutableDictionary<string, string>.Empty, cancellationToken);
         return avatarRules;
     }
+
+    /// <inheritdoc cref="IAvatarClient.GetUserAvatarAsync"/>
+    public Task<Avatar.Avatar> GetUserAvatarAsync(long userId, CancellationToken cancellationToken)
+    {
+        return _HttpClient.SendApiRequestAsync<Avatar.Avatar>(HttpMethod.Get, RobloxDomain.AvatarApi, $"v1/users/{userId}/avatar", ImmutableDictionary<string, string>.Empty, cancellationToken);
+    }
 }
