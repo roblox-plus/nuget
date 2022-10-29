@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Roblox.Avatar;
 using Roblox.Catalog;
 using Roblox.Economy;
 using Roblox.Groups;
@@ -35,6 +36,7 @@ public static class StartupExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddRobloxHttpClient<IAvatarClient, AvatarClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<ICatalogClient, CatalogClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IGroupsClient, GroupsClient>(configureHttpClient, httpMessageHandlerFactory);

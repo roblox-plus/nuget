@@ -19,6 +19,11 @@ public static class RobloxDomain
     public const string Value = ".roblox.com";
 
     /// <summary>
+    /// The avatar API.
+    /// </summary>
+    public const string AvatarApi = "https://avatar.roblox.com";
+
+    /// <summary>
     /// The catalog API.
     /// </summary>
     public const string CatalogApi = "https://catalog.roblox.com";
