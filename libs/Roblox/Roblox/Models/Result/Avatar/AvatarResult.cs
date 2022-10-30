@@ -6,8 +6,11 @@ namespace Roblox.Avatar;
 /// <summary>
 /// Information about a player avatar.
 /// </summary>
+/// <remarks>
+/// Used to deserialize the avatar response.
+/// </remarks>
 [DataContract]
-public class Avatar
+internal class AvatarResult
 {
     /// <summary>
     /// The avatar type.
@@ -31,5 +34,11 @@ public class Avatar
     /// The assets the avatar is wearing.
     /// </summary>
     [DataMember(Name = "assets")]
-    public IReadOnlyCollection<AvatarAsset> Assets { get; set; }
+    public IReadOnlyCollection<AvatarAssetResult> Assets { get; set; }
+
+    /// <summary>
+    /// The emotes the avatar has equipped.
+    /// </summary>
+    [DataMember(Name = "emotes")]
+    public IReadOnlyCollection<AvatarEmoteResult> Emotes { get; set; }
 }
