@@ -17,7 +17,7 @@ internal class CatalogBundleProductResult
     /// <summary>
     /// Whether or not the bundle is free.
     /// </summary>
-    [DataMember(Name = "isFree")]
+    [DataMember(Name = "isPublicDomain")]
     public bool Free { get; set; }
 
     /// <summary>
