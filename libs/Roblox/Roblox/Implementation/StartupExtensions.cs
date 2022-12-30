@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Roblox.Authentication;
 using Roblox.Avatar;
 using Roblox.Catalog;
 using Roblox.Economy;
@@ -74,10 +75,24 @@ public static class StartupExtensions
             })
             .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
             {
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                var authenticationSettings = new AuthenticationConfiguration();
+                var robloxConfiguration = configuration.GetSection("Roblox");
+                var authenticationConfiguration = robloxConfiguration.GetSection("Authentication");
+                authenticationConfiguration.Bind(authenticationSettings);
+
                 var sendRequestHandler = httpMessageHandlerFactory != null ? httpMessageHandlerFactory(serviceProvider) : new HttpClientHandler();
 
                 var xsrfTokenHandler = new XsrfTokenHandler();
                 xsrfTokenHandler.InnerHandler = sendRequestHandler;
+
+                if (!string.IsNullOrWhiteSpace(authenticationSettings.ClientId) && !string.IsNullOrWhiteSpace(authenticationSettings.ClientSecret))
+                {
+                    var authorizationHandler = new AuthorizationHandler(authenticationSettings);
+                    authorizationHandler.InnerHandler = xsrfTokenHandler;
+
+                    return authorizationHandler;
+                }
 
                 return xsrfTokenHandler;
             });
