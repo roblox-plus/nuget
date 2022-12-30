@@ -8,6 +8,7 @@ namespace Roblox.Authentication;
 /// <remarks>
 /// https://apis.roblox.com/oauth/v1/userinfo
 /// </remarks>
+[DataContract]
 internal class UserInfoResult
 {
     /// <summary>
