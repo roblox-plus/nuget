@@ -37,6 +37,7 @@ public static class StartupExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddRobloxHttpClient<IAuthenticationClient, AuthenticationClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IAvatarClient, AvatarClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<ICatalogClient, CatalogClient>(configureHttpClient, httpMessageHandlerFactory);
         services.AddRobloxHttpClient<IEconomyTransactionsClient, EconomyTransactionsClient>(configureHttpClient, httpMessageHandlerFactory);

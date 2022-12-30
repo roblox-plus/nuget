@@ -46,7 +46,7 @@ public class AuthorizationHandler : DelegatingHandler
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         if (request.RequestUri != null
-            && request.RequestUri.Host.EndsWith(RobloxDomain.Value, StringComparison.InvariantCulture)
+            && request.RequestUri.AbsoluteUri.StartsWith(RobloxDomain.Apis + "/oauth", StringComparison.InvariantCulture)
             && request.Headers.Authorization == null)
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", _AuthorizationHeader);

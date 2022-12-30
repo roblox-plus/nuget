@@ -87,7 +87,7 @@ internal static class HttpClientExtensions
     /// <exception cref="RobloxApiException">
     /// The Roblox request failed.
     /// </exception>
-    private static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, string endpoint, CancellationToken cancellationToken)
+    internal static async Task<TResult> SendApiRequestAsync<TResult>(this HttpClient httpClient, HttpRequestMessage httpRequest, string endpoint, CancellationToken cancellationToken)
         where TResult : class
     {
         HttpStatusCode? statusCode = null;

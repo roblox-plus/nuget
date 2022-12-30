@@ -1,4 +1,6 @@
+using System;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Roblox.Authentication;
 
@@ -20,4 +22,9 @@ public class AuthenticationConfiguration
     /// The client secret, pairing with the <see cref="ClientId"/>.
     /// </summary>
     public string ClientSecret { get; set; }
+
+    /// <summary>
+    /// The value to use for the outbound authorization header.
+    /// </summary>
+    public string Authorization => string.IsNullOrWhiteSpace(ClientId) || string.IsNullOrWhiteSpace(ClientSecret) ? null : Convert.ToBase64String(Encoding.UTF8.GetBytes($"{ClientId}:{ClientSecret}"));
 }
