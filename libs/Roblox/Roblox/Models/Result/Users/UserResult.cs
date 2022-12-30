@@ -29,6 +29,6 @@ public class UserResult
     /// <summary>
     /// The name of the user as they were requested.
     /// </summary>
-    [DataMember(Name = "requestedUsername")]
+    [DataMember(Name = "requestedUsername", EmitDefaultValue = false)]
     internal string RequestedUsername { get; set; }
 }
