@@ -19,6 +19,11 @@ public static class RobloxDomain
     public const string Value = ".roblox.com";
 
     /// <summary>
+    /// Strange apis domain, not to be confused with the also existing "api" domain. Sure.
+    /// </summary>
+    public const string Apis = "https://apis.roblox.com";
+
+    /// <summary>
     /// The avatar API.
     /// </summary>
     public const string AvatarApi = "https://avatar.roblox.com";
