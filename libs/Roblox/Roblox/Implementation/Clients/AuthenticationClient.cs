@@ -23,7 +23,7 @@ public class AuthenticationClient : IAuthenticationClient
     /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
     /// <exception cref="ArgumentNullException">
     /// - <paramref name="httpClient"/>
-    /// - <param name="configuration"></param>
+    /// - <paramref name="configuration"/>
     /// </exception>
     public AuthenticationClient(HttpClient httpClient, IConfiguration configuration)
     {
