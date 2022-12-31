@@ -41,7 +41,7 @@ public class LoginResult
     /// <remarks>
     /// This property exists for serialization.
     /// </remarks>
-    [DataMember(Name = "scopes")]
+    [DataMember(Name = "scope")]
     public string RawScopes => string.Join(' ', Scopes);
 
     /// <summary>

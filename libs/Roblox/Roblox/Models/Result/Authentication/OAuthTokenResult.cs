@@ -68,7 +68,7 @@ internal class OAuthTokenResult
     /// <remarks>
     /// This property exists for deserialization.
     /// </remarks>
-    [DataMember(Name = "scopes")]
+    [DataMember(Name = "scope")]
     public string RawScopes
     {
         get => string.Join(' ', _Scopes);

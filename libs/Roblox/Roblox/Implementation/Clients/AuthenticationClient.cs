@@ -178,13 +178,27 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
 
     private async Task<UserResult> GetUserDataAsync(OAuthTokenResult authenticationResult, CancellationToken cancellationToken)
     {
-        // HACK: We're taking advantage of that userinfo and token/introspect both return the user ID as "sub", so we can deserialize it into the same model.
-        var userInfoPath = authenticationResult.Scopes.Contains(OAuthScope.Profile) ? "oauth/v1/userinfo" : "oauth/v1/token/introspect";
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, new Uri($"{RobloxDomain.Apis}/{userInfoPath}"));
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
+        HttpRequestMessage httpRequest;
+        string requestPath;
 
-        var response = await _HttpClient.SendApiRequestAsync<UserInfoResult>(httpRequest, userInfoPath, cancellationToken);
+        if (authenticationResult.Scopes.Contains(OAuthScope.Profile))
+        {
+            requestPath = "oauth/v1/userinfo";
+            httpRequest = new HttpRequestMessage(HttpMethod.Get, new Uri($"{RobloxDomain.Apis}/{requestPath}"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
+        }
+        else
+        {
+            requestPath = "oauth/v1/token/introspect";
+            httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/{requestPath}"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
+            httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["token"] = authenticationResult.AccessToken
+            });
+        }
 
+        var response = await _HttpClient.SendApiRequestAsync<UserInfoResult>(httpRequest, requestPath, cancellationToken);
         return new UserResult
         {
             Id = response.Id,
