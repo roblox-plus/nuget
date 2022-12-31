@@ -15,7 +15,8 @@ public interface IAuthenticationClient
     /// Logs in a user with their authorization code.
     /// </summary>
     /// <remarks>
-    /// Requires the openid + profile scopes.
+    /// If the <see cref="OAuthScope.Profile"/> scope is available, it will be used to fetch data for <see cref="LoginResult.User"/>.
+    /// If it is unavailable, only the <see cref="UserInfoResult.Id"/> field will be populated.
     /// </remarks>
     /// <param name="code">The authorization code.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
@@ -26,7 +27,8 @@ public interface IAuthenticationClient
     /// Refreshes an authentication session, using the refresh token.
     /// </summary>
     /// <remarks>
-    /// Requires the openid + profile scopes.
+    /// If the <see cref="OAuthScope.Profile"/> scope is available, it will be used to fetch data for <see cref="LoginResult.User"/>.
+    /// If it is unavailable, only the <see cref="UserInfoResult.Id"/> field will be populated.
     /// </remarks>
     /// <param name="refreshToken">The refresh token.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>

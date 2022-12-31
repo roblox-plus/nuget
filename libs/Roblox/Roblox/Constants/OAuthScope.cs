@@ -1,4 +1,4 @@
-namespace Roblox.Api;
+namespace Roblox.Authentication;
 
 /// <summary>
 /// Roblox OAuth scopes that exist.
