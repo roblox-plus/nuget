@@ -21,4 +21,15 @@ public interface IAuthenticationClient
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of logging in.</returns>
     Task<LoginResult> LoginAsync(string code, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Refreshes an authentication session, using the refresh token.
+    /// </summary>
+    /// <remarks>
+    /// Requires the openid + profile scopes.
+    /// </remarks>
+    /// <param name="refreshToken">The refresh token.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The result of logging in, with the refreshed session.</returns>
+    Task<LoginResult> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
 }
