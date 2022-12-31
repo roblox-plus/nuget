@@ -65,6 +65,11 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
     /// <inheritdoc cref="IAuthenticationClient.LoginAsync"/>
     public async Task<LoginResult> LoginAsync(string code, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(code));
+        }
+
         if (string.IsNullOrWhiteSpace(_Authorization))
         {
             throw new ConfigurationException($"The app must have the Roblox.Authentication configuration filled in with {nameof(AuthenticationConfiguration.ClientId)} and {nameof(AuthenticationConfiguration.ClientSecret)} to use this method.");
@@ -101,12 +106,38 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
     /// <inheritdoc cref="IAuthenticationClient.RefreshAsync"/>
     public Task<LoginResult> RefreshAsync(string refreshToken, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(refreshToken));
+        }
+
         if (string.IsNullOrWhiteSpace(_Authorization))
         {
             throw new ConfigurationException($"The app must have the Roblox.Authentication configuration filled in with {nameof(AuthenticationConfiguration.ClientId)} and {nameof(AuthenticationConfiguration.ClientSecret)} to use this method.");
         }
 
         return _RefreshCache.GetOrAdd(refreshToken, t => UncachedRefreshAsync(t, cancellationToken));
+    }
+
+    /// <inheritdoc cref="IAuthenticationClient.LogoutAsync"/>
+    public async Task LogoutAsync(string token, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(token));
+        }
+
+        // If it's in there... remove it.
+        _RefreshCache.TryRemove(token, out _);
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/oauth/v1/token/revoke"));
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
+        httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["token"] = token
+        });
+
+        await _HttpClient.SendApiRequestAsync<OAuthTokenResult>(httpRequest, "oauth/v1/token/revoke", cancellationToken);
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
