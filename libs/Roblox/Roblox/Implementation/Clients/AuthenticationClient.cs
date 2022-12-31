@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Prometheus;
 using Roblox.Api;
 using Roblox.Users;
 
@@ -14,6 +15,9 @@ namespace Roblox.Authentication;
 /// <inheritdoc cref="IAuthenticationClient"/>
 public class AuthenticationClient : IAuthenticationClient, IDisposable
 {
+    private const string _LoginGrantType = "authorization_code";
+    private const string _RefreshTokenGrantType = "refresh_token";
+
     /// <summary>
     /// A dictionary, keyed by refresh token, of tokens that we have already refreshed.
     /// </summary>
@@ -26,6 +30,11 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
     private readonly HttpClient _HttpClient;
     private readonly string _Authorization;
     private readonly Timer _CacheClearTimer;
+
+    private static readonly Counter _AuthenticationFailureCounter = Metrics.CreateCounter(
+        name: "authentication_failure",
+        help: "Number of Roblox OAuth authentication attempts that fail.",
+        labelNames: new[] { "grant_type" });
 
     /// <summary>
     /// Initializes a new <seealso cref="AuthenticationClient"/>.
@@ -61,24 +70,32 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
             throw new ConfigurationException($"The app must have the Roblox.Authentication configuration filled in with {nameof(AuthenticationConfiguration.ClientId)} and {nameof(AuthenticationConfiguration.ClientSecret)} to use this method.");
         }
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/oauth/v1/token"));
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
-        httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        try
         {
-            ["grant_type"] = "authorization_code",
-            ["code"] = code
-        });
-        var httpResponse = await _HttpClient.SendApiRequestAsync<OAuthTokenResult>(httpRequest, "oauth/v1/token", cancellationToken);
-        var user = await GetUserDataAsync(httpResponse, cancellationToken);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/oauth/v1/token"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
+            httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = _LoginGrantType,
+                ["code"] = code
+            });
+            var httpResponse = await _HttpClient.SendApiRequestAsync<OAuthTokenResult>(httpRequest, "oauth/v1/token", cancellationToken);
+            var user = await GetUserDataAsync(httpResponse, cancellationToken);
 
-        return new LoginResult
+            return new LoginResult
+            {
+                AccessToken = httpResponse.AccessToken,
+                RefreshToken = httpResponse.RefreshToken,
+                AccessTokenExpiration = httpResponse.AccessTokenExpiration,
+                Scopes = httpResponse.Scopes,
+                User = user
+            };
+        }
+        catch (Exception)
         {
-            AccessToken = httpResponse.AccessToken,
-            RefreshToken = httpResponse.RefreshToken,
-            AccessTokenExpiration = httpResponse.AccessTokenExpiration,
-            Scopes = httpResponse.Scopes,
-            User = user
-        };
+            _AuthenticationFailureCounter.WithLabels(_LoginGrantType).Inc();
+            throw;
+        }
     }
 
     /// <inheritdoc cref="IAuthenticationClient.RefreshAsync"/>
@@ -100,24 +117,32 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
 
     private async Task<LoginResult> UncachedRefreshAsync(string refreshToken, CancellationToken cancellationToken)
     {
-        var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/oauth/v1/token"));
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
-        httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        try
         {
-            ["grant_type"] = "refresh_token",
-            ["refresh_token"] = refreshToken
-        });
-        var httpResponse = await _HttpClient.SendApiRequestAsync<OAuthTokenResult>(httpRequest, "oauth/v1/token", cancellationToken);
-        var user = await GetUserDataAsync(httpResponse, cancellationToken);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/oauth/v1/token"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
+            httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = _RefreshTokenGrantType,
+                ["refresh_token"] = refreshToken
+            });
+            var httpResponse = await _HttpClient.SendApiRequestAsync<OAuthTokenResult>(httpRequest, "oauth/v1/token", cancellationToken);
+            var user = await GetUserDataAsync(httpResponse, cancellationToken);
 
-        return new LoginResult
+            return new LoginResult
+            {
+                AccessToken = httpResponse.AccessToken,
+                RefreshToken = httpResponse.RefreshToken,
+                AccessTokenExpiration = httpResponse.AccessTokenExpiration,
+                Scopes = httpResponse.Scopes,
+                User = user
+            };
+        }
+        catch (Exception)
         {
-            AccessToken = httpResponse.AccessToken,
-            RefreshToken = httpResponse.RefreshToken,
-            AccessTokenExpiration = httpResponse.AccessTokenExpiration,
-            Scopes = httpResponse.Scopes,
-            User = user
-        };
+            _AuthenticationFailureCounter.WithLabels(_RefreshTokenGrantType).Inc();
+            throw;
+        }
     }
 
     private async Task<UserResult> GetUserDataAsync(OAuthTokenResult authenticationResult, CancellationToken cancellationToken)
