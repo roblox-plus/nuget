@@ -15,10 +15,23 @@ public interface IAuthenticationClient
     /// Logs in a user with their authorization code.
     /// </summary>
     /// <remarks>
-    /// Requires the openid + profile scopes.
+    /// If the <see cref="OAuthScope.Profile"/> scope is available, it will be used to fetch data for <see cref="LoginResult.User"/>.
+    /// If it is unavailable, only the <see cref="UserInfoResult.Id"/> field will be populated.
     /// </remarks>
     /// <param name="code">The authorization code.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of logging in.</returns>
     Task<LoginResult> LoginAsync(string code, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Refreshes an authentication session, using the refresh token.
+    /// </summary>
+    /// <remarks>
+    /// If the <see cref="OAuthScope.Profile"/> scope is available, it will be used to fetch data for <see cref="LoginResult.User"/>.
+    /// If it is unavailable, only the <see cref="UserInfoResult.Id"/> field will be populated.
+    /// </remarks>
+    /// <param name="refreshToken">The refresh token.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The result of logging in, with the refreshed session.</returns>
+    Task<LoginResult> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
 }
