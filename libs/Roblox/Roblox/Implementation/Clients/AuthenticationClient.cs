@@ -185,20 +185,20 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
         {
             requestPath = "oauth/v1/userinfo";
             httpRequest = new HttpRequestMessage(HttpMethod.Get, new Uri($"{RobloxDomain.Apis}/{requestPath}"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
         }
         else
         {
             requestPath = "oauth/v1/token/introspect";
             httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri($"{RobloxDomain.Apis}/{requestPath}"));
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", _Authorization);
             httpRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["token"] = authenticationResult.AccessToken
             });
         }
 
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
         var response = await _HttpClient.SendApiRequestAsync<UserInfoResult>(httpRequest, requestPath, cancellationToken);
-
         return new UserResult
         {
             Id = response.Id,
