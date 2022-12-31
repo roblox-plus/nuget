@@ -34,4 +34,11 @@ public interface IAuthenticationClient
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of logging in, with the refreshed session.</returns>
     Task<LoginResult> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Invalidates an access token, or refresh token.
+    /// </summary>
+    /// <param name="token">The access token, or refresh token to invalidate.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    Task LogoutAsync(string token, CancellationToken cancellationToken);
 }
