@@ -12,7 +12,7 @@ public class ApiErrorCodeResult
     /// The error code.
     /// </summary>
     [DataMember(Name = "code")]
-    public int Code { get; set; }
+    public string Code { get; set; }
 
     /// <summary>
     /// The error message.

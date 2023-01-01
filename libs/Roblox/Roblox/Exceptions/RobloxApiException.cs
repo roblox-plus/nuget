@@ -19,7 +19,7 @@ public class RobloxApiException : Exception
     /// <summary>
     /// The error code from the response body.
     /// </summary>
-    public int? ErrorCode { get; }
+    public string ErrorCode { get; }
 
     /// <summary>
     /// The error message from the response body.
@@ -65,6 +65,16 @@ public class RobloxApiException : Exception
         {
             var responseBody = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var errors = JsonConvert.DeserializeObject<ApiErrorResult>(responseBody);
+
+            if (!string.IsNullOrWhiteSpace(errors?.SingularErrorCode) && !string.IsNullOrWhiteSpace(errors?.SingularErrorMessage))
+            {
+                return new ApiErrorCodeResult
+                {
+                    Code = errors.SingularErrorCode,
+                    Message = errors.SingularErrorMessage
+                };
+            }
+
             return errors?.Errors.FirstOrDefault();
         }
         catch
