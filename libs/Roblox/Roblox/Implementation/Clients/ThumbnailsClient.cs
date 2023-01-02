@@ -42,6 +42,12 @@ public class ThumbnailsClient : IThumbnailsClient
         _ThumbnailsClient = new BatchingClient<string, ThumbnailResult>(MultiGetThumbnailsAsync, clientName, batchSize: settings.BatchSize, throttle: settings.Throttle, sendInterval: settings.MaxWaitTime);
     }
 
+    /// <inheritdoc cref="IThumbnailsClient.GetUserHeadShotThumbnailAsync"/>
+    public Task<ThumbnailResult> GetUserHeadShotThumbnailAsync(long userId, CancellationToken cancellationToken)
+    {
+        return _ThumbnailsClient.GetAsync($"AvatarHeadShot:{userId}", cancellationToken);
+    }
+
     /// <inheritdoc cref="IThumbnailsClient.GetAssetThumbnailAsync"/>
     public Task<ThumbnailResult> GetAssetThumbnailAsync(long assetId, CancellationToken cancellationToken)
     {

@@ -9,6 +9,14 @@ namespace Roblox.Thumbnails;
 public interface IThumbnailsClient
 {
     /// <summary>
+    /// Fetches the 2D head shot thumbnail for a user.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="ThumbnailResult"/>.</returns>
+    Task<ThumbnailResult> GetUserHeadShotThumbnailAsync(long userId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Fetches the 2D thumbnail for an asset.
     /// </summary>
     /// <param name="assetId">The asset ID.</param>
