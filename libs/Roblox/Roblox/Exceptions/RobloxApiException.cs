@@ -49,7 +49,18 @@ public class RobloxApiException : Exception
         : this(ParseErrorCodeResult(httpResponse), httpRequest, httpResponse)
     {
         StatusCode = httpResponse.StatusCode;
+    }
 
+    /// <summary>
+    /// Makes a copy of <see cref="RobloxApiException"/>.
+    /// </summary>
+    /// <param name="copyFromExtension">The <see cref="RobloxApiException"/> to copy from.</param>
+    public RobloxApiException(RobloxApiException copyFromExtension)
+        : this(copyFromExtension.Message, copyFromExtension.InnerException)
+    {
+        StatusCode = copyFromExtension.StatusCode;
+        ErrorCode = copyFromExtension.ErrorCode;
+        ErrorMessage = copyFromExtension.ErrorMessage;
     }
 
     private RobloxApiException(ApiErrorCodeResult errorCodeResult, HttpRequestMessage httpRequest, HttpResponseMessage httpResponse)

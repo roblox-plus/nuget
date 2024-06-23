@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -168,6 +169,10 @@ public class AuthenticationClient : IAuthenticationClient, IDisposable
                 Scopes = httpResponse.Scopes,
                 User = user
             };
+        }
+        catch (RobloxApiException e) when (e.StatusCode == HttpStatusCode.BadRequest && e.ErrorCode == "invalid_grant")
+        {
+            throw new RobloxUnauthenticatedException(e);
         }
         catch (Exception)
         {
