@@ -16,4 +16,13 @@ public class RobloxUnauthenticatedException : RobloxApiException
         : base(httpRequest, httpResponse)
     {
     }
+
+    /// <summary>
+    /// Converts a <see cref="RobloxApiException"/> to a <see cref="RobloxUnauthenticatedException"/>.
+    /// </summary>
+    /// <param name="originalException">The <see cref="RobloxApiException"/>.</param>
+    public RobloxUnauthenticatedException(RobloxApiException originalException)
+        : base(originalException)
+    {
+    }
 }
